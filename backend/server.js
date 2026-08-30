@@ -40,6 +40,22 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, limits: { fileSize: 15 * 1024 * 1024 } });
 
 // ============ AI 批改（MiniMax-M3 视觉） ============
+// 从模型输出中提取 JSON：去掉 think 标签 / markdown 代码块，再匹配 { }
+function extractJsonFromText(text) {
+  if (!text) return null;
+  let t = text.replace(/<think>[\s\S]*?<\/think>/g, '');
+  t = t.replace(/<\|thinking\|>[\s\S]*?<\/\|thinking\|>/g, '');
+  t = t.replace(/<\|Thinking\|>[\s\S]*?<\/\|Thinking\|>/g, '');
+  t = t.replace(/```json|```/g, '');
+  const m = t.match(/\{[\s\S]*\}/);
+  if (!m) return null;
+  try {
+    return JSON.parse(m[0]);
+  } catch (e) {
+    return null;
+  }
+}
+
 async function gradeWithMiniMax(imagePath) {
   const apiKey = process.env.MINIMAX_CN_API_KEY;
   if (!apiKey) {
@@ -58,42 +74,47 @@ async function gradeWithMiniMax(imagePath) {
 要求：
 1. 逐题列出：题目、学生答案、正确答案、是否正确
 2. 如果题目或答案模糊看不清，correct 标记为 false，并在 note 里写"看不清"
-3. 只输出 JSON，不要输出其他文字，格式：
-{
-  "questions": [
-    {"q": "12+34", "student_answer": "46", "correct_answer": "46", "correct": true, "note": ""}
-  ],
-  "total": 10,
-  "correct": 8,
-  "accuracy": 0.8
-}
+3. 严格只输出一个 JSON 对象，不要 markdown 代码块标记，不要任何解释、注释或多余文字。输出格式：
+{"questions": [{"q":"12+34","student_answer":"46","correct_answer":"46","correct":true,"note":""}], "total":10, "correct":8, "accuracy":0.8}
 其中 total 为题目总数，correct 为答对数量，accuracy 为正确率(0-1)。`;
 
-    const resp = await fetch('https://api.minimaxi.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'MiniMax-M3',
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            { type: 'image_url', image_url: { url: `data:${mime};base64,${b64}` } }
-          ]
-        }],
-        max_tokens: 1500
-      })
-    });
-    const data = await resp.json();
-    const text = data?.choices?.[0]?.message?.content || '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    const callApi = async (promptText) => {
+      const resp = await fetch('https://api.minimaxi.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'MiniMax-M3',
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text: promptText },
+              { type: 'image_url', image_url: { url: `data:${mime};base64,${b64}` } }
+            ]
+          }],
+          max_tokens: 4000
+        })
+      });
+      const data = await resp.json();
+      return data?.choices?.[0]?.message?.content || '';
+    };
+
+    let text = await callApi(prompt);
+    let result = extractJsonFromText(text);
+
+    // 解析失败时重试一次（更简短的提示词）
+    if (!result) {
+      console.error('AI 首次解析失败，重试。raw:', text.slice(0, 300));
+      const retryPrompt = `识别图片中的计算题并批改。只输出 JSON，格式：{"questions":[{"q":"题目","student_answer":"学生答案","correct_answer":"正确答案","correct":true,"note":""}],"total":题目数,"correct":答对数,"accuracy":正确率}。看不清就在 note 写"看不清"。不要输出 JSON 以外的任何内容。`;
+      text = await callApi(retryPrompt);
+      result = extractJsonFromText(text);
+    }
+
+    if (!result) {
       return { status: 'failed', error: 'AI 返回格式无法解析', raw: text.slice(0, 500) };
     }
-    const result = JSON.parse(jsonMatch[0]);
     return { status: 'graded', ...result };
   } catch (e) {
     console.error('AI 批改失败', e);
