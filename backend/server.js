@@ -37,7 +37,7 @@ const storage = multer.diskStorage({
     cb(null, `${Date.now()}-${Math.random().toString(36).substr(2, 9)}${ext}`);
   }
 });
-const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
+const upload = multer({ storage, limits: { fileSize: 15 * 1024 * 1024 } });
 
 // ============ AI 批改（MiniMax-M3 视觉） ============
 async function gradeWithMiniMax(imagePath) {
@@ -609,6 +609,18 @@ app.get('/api/reports/week', authenticateToken, (req, res) => {
 app.get('/api/reports', authenticateToken, (req, res) => {
   const reports = db.getReports();
   res.json(reports);
+});
+
+// ============ 上传/通用错误处理（返回 JSON 而不是 HTML） ============
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({ error: '图片太大，请压缩后重试（限制 15MB）' });
+    }
+    return res.status(400).json({ error: `上传失败：${err.message}` });
+  }
+  console.error('服务错误:', err);
+  res.status(500).json({ error: '服务器内部错误' });
 });
 
 // ============ 启动 ============

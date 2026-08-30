@@ -1139,11 +1139,15 @@
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: fd
                 });
-                const sub = await res.json();
-                showSubmitResult(sub);
+                const data = await res.json().catch(() => null);
+                if (!res.ok || !data) {
+                    alert('提交失败：' + (data?.error || `服务器返回异常(${res.status})，请重试`));
+                    return;
+                }
+                showSubmitResult(data);
                 loadTodayTasks(); // 刷新今日任务显示已提交状态
             } catch (e) {
-                alert('提交失败');
+                alert('提交失败：网络错误，请检查网络后重试');
                 console.error(e);
             }
             btn.disabled = false;
