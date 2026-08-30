@@ -203,6 +203,38 @@ app.get('/api/checkins/today', authenticateToken, (req, res) => {
   res.json({ date: today, tasks: result });
 });
 
+// 周统计与月历接口（必须定义在 /api/checkins/:date 之前，否则会被日期路由拦截）
+app.get('/api/checkins/week', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+
+  // 获取本周日期范围
+  const now = new Date();
+  const dayOfWeek = now.getDay() || 7;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - dayOfWeek + 1);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const startDate = monday.toISOString().split('T')[0];
+  const endDate = sunday.toISOString().split('T')[0];
+
+  const stats = db.getCheckinsGroupedByDate(studentId, startDate, endDate);
+
+  res.json({ week_start: startDate, week_end: endDate, stats });
+});
+
+app.get('/api/checkins/calendar', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const { month } = req.query; // YYYY-MM
+
+  const startDate = `${month}-01`;
+  const endDate = `${month}-31`;
+
+  const stats = db.getCheckinsGroupedByDate(studentId, startDate, endDate);
+
+  res.json(stats);
+});
+
 app.get('/api/checkins/:date', authenticateToken, (req, res) => {
   const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
 
@@ -253,37 +285,6 @@ app.delete('/api/checkins/:date/:taskId', authenticateToken, requireParent, (req
   const studentId = parseInt(req.query.student_id);
   const success = db.removeCheckin(studentId, parseInt(req.params.taskId), req.params.date);
   res.json({ success });
-});
-
-app.get('/api/checkins/week', authenticateToken, (req, res) => {
-  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
-
-  // 获取本周日期范围
-  const now = new Date();
-  const dayOfWeek = now.getDay() || 7;
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - dayOfWeek + 1);
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-
-  const startDate = monday.toISOString().split('T')[0];
-  const endDate = sunday.toISOString().split('T')[0];
-
-  const stats = db.getCheckinsGroupedByDate(studentId, startDate, endDate);
-
-  res.json({ week_start: startDate, week_end: endDate, stats });
-});
-
-app.get('/api/checkins/calendar', authenticateToken, (req, res) => {
-  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
-  const { month } = req.query; // YYYY-MM
-
-  const startDate = `${month}-01`;
-  const endDate = `${month}-31`;
-
-  const stats = db.getCheckinsGroupedByDate(studentId, startDate, endDate);
-
-  res.json(stats);
 });
 
 // ============ 错题 API ============

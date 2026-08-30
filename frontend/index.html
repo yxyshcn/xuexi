@@ -709,23 +709,89 @@
             cursor: pointer;
         }
 
-        /* 打卡热力图 */
-        .heatmap {
+        /* 打卡热力图（真实月历模式） */
+        .calendar-heatmap {
+            font-size: 12px;
+        }
+
+        .cal-header {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 3px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-bottom: 6px;
         }
 
-        .heatmap-cell {
+        .cal-header .weekend {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .cal-cell {
             aspect-ratio: 1;
-            border-radius: 3px;
+            border-radius: 6px;
             background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #555;
+            position: relative;
+            cursor: default;
+            transition: transform 0.1s;
         }
 
-        .heatmap-cell.level-1 { background: #c8e6c9; }
-        .heatmap-cell.level-2 { background: #81c784; }
-        .heatmap-cell.level-3 { background: #4caf50; }
-        .heatmap-cell.level-4 { background: #2e7d32; }
+        .cal-cell:hover {
+            transform: scale(1.08);
+        }
+
+        .cal-cell.empty {
+            background: transparent;
+        }
+
+        .cal-cell.today {
+            box-shadow: inset 0 0 0 2px var(--primary);
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .cal-cell.weekend {
+            background: #f7f0ea;
+        }
+
+        .cal-cell.level-1 { background: #c8e6c9; }
+        .cal-cell.level-2 { background: #81c784; }
+        .cal-cell.level-3 { background: #4caf50; color: #fff; font-weight: 600; }
+        .cal-cell.level-4 { background: #2e7d32; color: #fff; font-weight: 600; }
+
+        .cal-legend {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            margin-top: 10px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .cal-legend .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .cal-legend .legend-dot.level-1 { background: #c8e6c9; }
+        .cal-legend .legend-dot.level-2 { background: #81c784; }
+        .cal-legend .legend-dot.level-3 { background: #4caf50; }
+        .cal-legend .legend-dot.level-4 { background: #2e7d32; }
 
         /* 空状态 */
         .empty-state {
@@ -1177,8 +1243,8 @@
                                     <h3>📆 本月打卡热力图</h3>
                                 </div>
                                 <div class="card-body">
-                                    <div class="heatmap" id="heatmap">
-                                        <!-- 动态填充 -->
+                                    <div class="calendar-heatmap" id="heatmap">
+                                        <div class="empty-state"><div class="empty-icon">📅</div><p>加载中...</p></div>
                                     </div>
                                 </div>
                             </div>
@@ -1807,14 +1873,89 @@
             } catch (e) { console.error(e); }
         }
 
-        function generateHeatmap() {
+        // 本月打卡热力图（真实月历模式）
+        async function generateHeatmap() {
             const container = document.getElementById('heatmap');
-            const cells = [];
-            for (let i = 0; i < 28; i++) {
-                const level = Math.random() > 0.3 ? Math.floor(Math.random() * 4) + 1 : 0;
-                cells.push(`<div class="heatmap-cell ${level > 0 ? 'level-' + level : ''}" title="Day ${i+1}"></div>`);
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const monthStr = `${year}-${String(month).padStart(2, '0')}`;
+
+            // 获取当月真实打卡数据（后端 /api/checkins/calendar）
+            let stats = [];
+            try {
+                const res = await fetch(`${API_BASE}/checkins/calendar?month=${monthStr}&student_id=${studentId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                stats = await res.json();
+            } catch (e) {
+                console.error('加载月历数据失败', e);
             }
-            container.innerHTML = cells.join('');
+
+            const statMap = {};
+            (stats || []).forEach(s => {
+                const day = parseInt(s.date.split('-')[2]);
+                statMap[day] = s;
+            });
+
+            // 当月第一天是星期几，按周一开头计算偏移
+            const firstDay = new Date(year, month - 1, 1).getDay(); // 0=周日
+            const offset = (firstDay + 6) % 7; // 周一=0 ... 周日=6
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const today = now.getDate();
+
+            // 完成率 → 颜色等级
+            const levelOf = (s) => {
+                if (!s || s.total === 0) return { level: 0, rate: 0 };
+                const rate = s.completed / s.total;
+                const level = rate >= 1 ? 4 : rate >= 0.67 ? 3 : rate >= 0.34 ? 2 : rate > 0 ? 1 : 0;
+                return { level, rate: Math.round(rate * 100) };
+            };
+
+            const isWeekend = (day) => {
+                const d = new Date(year, month - 1, day).getDay();
+                return d === 0 || d === 6;
+            };
+
+            // 周几表头（周一开头，周末高亮）
+            let html = '<div class="cal-header">' +
+                ['一', '二', '三', '四', '五', '六', '日']
+                    .map((w, i) => `<span class="${i >= 5 ? 'weekend' : ''}">${w}</span>`).join('') +
+                '</div><div class="cal-grid">';
+
+            // 月初占位（对齐到正确的星期）
+            for (let i = 0; i < offset; i++) {
+                html += '<div class="cal-cell empty"></div>';
+            }
+
+            // 每天一个格子：日期数字 + 完成率颜色
+            for (let day = 1; day <= daysInMonth; day++) {
+                const s = statMap[day];
+                const { level, rate } = levelOf(s);
+                const cls = [
+                    'cal-cell',
+                    `level-${level}`,
+                    day === today ? 'today' : '',
+                    isWeekend(day) ? 'weekend' : ''
+                ].filter(Boolean).join(' ');
+                const title = s && s.total > 0
+                    ? `${month}月${day}日 完成率${rate}% (${s.completed}/${s.total})`
+                    : `${month}月${day}日 无任务`;
+                html += `<div class="${cls}" title="${title}">${day}</div>`;
+            }
+
+            html += '</div>';
+
+            // 图例
+            html += `<div class="cal-legend">
+                <span>完成率</span>
+                <span class="legend-dot level-1"></span>
+                <span class="legend-dot level-2"></span>
+                <span class="legend-dot level-3"></span>
+                <span class="legend-dot level-4"></span>
+            </div>`;
+
+            container.innerHTML = html;
         }
     </script>
 </body>
