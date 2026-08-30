@@ -1043,6 +1043,39 @@
             background: #f5f5f5;
         }
 
+        /* 质量评分星星 */
+        .quality-stars {
+            display: inline-flex;
+            gap: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .q-star {
+            cursor: pointer;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            color: #999;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .q-star:hover {
+            background: #e8e8e8;
+        }
+
+        .q-star.active {
+            background: #fff3cd;
+            color: #d4a574;
+        }
+
+        .q-star[data-quality="0"].active {
+            background: #fceae8;
+            color: #c0392b;
+        }
+
         /* 模态框 */
         .modal-overlay {
             display: none;
@@ -1191,6 +1224,12 @@
                 </div>
                 <div class="nav-item" data-page="mistakes" onclick="switchPage('mistakes')">
                     <span class="nav-icon">📝</span> 错题本
+                </div>
+                <div class="nav-item" data-page="points" onclick="switchPage('points')">
+                    <span class="nav-icon">🏆</span> 积分管理
+                </div>
+                <div class="nav-item" data-page="rewards" onclick="switchPage('rewards')">
+                    <span class="nav-icon">🎁</span> 奖励配置
                 </div>
                 <div class="nav-section-title">更多</div>
                 <div class="nav-item" data-page="review" onclick="switchPage('review')">
@@ -1371,6 +1410,41 @@
                     </div>
                 </div>
                 <div class="page" id="page-mistakes"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📝</div><p>错题本 — 开发中</p></div></div></div></div>
+
+                <!-- 积分管理页 -->
+                <div class="page" id="page-points">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>🏆 积分管理</h3>
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <span id="pointsBalance" style="font-size:18px;font-weight:700;color:var(--accent);"></span>
+                                <button class="btn-small" onclick="checkWeeklyBonus()" style="background:var(--purple);">📋 周全勤检查</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="weeklyBonusResult" style="display:none;margin-bottom:16px;"></div>
+                            <h4 style="margin-bottom:12px;font-size:14px;color:var(--text-secondary);">积分流水</h4>
+                            <div id="pointsLedger">
+                                <div class="empty-state"><div class="empty-icon">📋</div><p>加载中...</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 奖励配置页 -->
+                <div class="page" id="page-rewards">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>🎁 奖励配置</h3>
+                            <button class="btn-small" onclick="showAddRewardModal()">+ 新增奖励</button>
+                        </div>
+                        <div class="card-body no-padding">
+                            <div id="rewardsList">
+                                <div class="empty-state"><div class="empty-icon">🎁</div><p>加载中...</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="page" id="page-review"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📈</div><p>周报复盘 — 开发中</p></div></div></div></div>
                 <div class="page" id="page-focus"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">⏱</div><p>专注计时 — 开发中</p></div></div></div></div>
                 <div class="page" id="page-books"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📚</div><p>阅读书单 — 开发中</p></div></div></div></div>
@@ -1453,6 +1527,35 @@
         </div>
     </div>
 
+    <!-- 奖励编辑模态框 -->
+    <div class="modal-overlay" id="rewardModal">
+        <div class="modal-box">
+            <h3 id="rewardModalTitle">新增奖励</h3>
+            <div class="modal-form">
+                <div class="form-group">
+                    <label>奖励名称</label>
+                    <input type="text" id="rewardName" placeholder="例如：多看一集动画">
+                </div>
+                <div class="form-group">
+                    <label>所需积分</label>
+                    <input type="number" id="rewardCost" placeholder="30" min="1">
+                </div>
+                <div class="form-group">
+                    <label>图标（emoji）</label>
+                    <input type="text" id="rewardIcon" placeholder="🎁" maxlength="4">
+                </div>
+                <div class="form-group">
+                    <label>描述（可选）</label>
+                    <textarea id="rewardDesc" placeholder="奖励说明..."></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-small secondary" onclick="closeRewardModal()">取消</button>
+                <button class="btn-small" id="rewardModalSave" onclick="saveReward()">保存</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE = '/xuexi/api';
         let token = localStorage.getItem('xuexi_token');
@@ -1513,6 +1616,8 @@
             goals: ['学期目标', '首页 / 学期目标'],
             checkins: ['每日打卡', '首页 / 每日打卡'],
             mistakes: ['错题本', '首页 / 错题本'],
+            points: ['积分管理', '首页 / 积分管理'],
+            rewards: ['奖励配置', '首页 / 奖励配置'],
             review: ['周报复盘', '首页 / 周报复盘'],
             focus: ['专注计时', '首页 / 专注计时'],
             books: ['阅读书单', '首页 / 阅读书单'],
@@ -1539,6 +1644,8 @@
             // 加载对应页面数据
             if (page === 'checkins') loadCheckinPage();
             if (page === 'settings') loadTaskConfigPage();
+            if (page === 'points') loadPointsPage();
+            if (page === 'rewards') loadRewardsPage();
         }
 
         // ============ 每日打卡管理（家长端） ============
@@ -1596,6 +1703,18 @@
                 return `<button class="btn-submit-photo" onclick="event.stopPropagation();openSubmitModal(${task.id}, '${label.replace(/'/g, "\\'")}')">📷 提交</button>`;
             };
 
+            // 质量评分组件（0/1/2 星）
+            const qualityStars = (taskId, currentQuality) => {
+                const q = currentQuality !== null && currentQuality !== undefined ? currentQuality : -1;
+                let html = '<div class="quality-stars" onclick="event.stopPropagation()">';
+                for (let i = 0; i <= 2; i++) {
+                    const active = i <= q ? 'active' : '';
+                    html += `<span class="q-star ${active}" data-task="${taskId}" data-quality="${i}" onclick="setQuality(${taskId}, ${i})">${i === 0 ? '✗' : i === 1 ? '⭐' : '⭐⭐'}</span>`;
+                }
+                html += '</div>';
+                return html;
+            };
+
             // 统计完成率
             let total = 0, completed = 0;
             data.tasks.forEach(task => {
@@ -1632,6 +1751,7 @@
                                 <span class="task-name">${sub.name}</span>
                                 ${subBadge(subMap[sub.id])}
                                 ${photoBtn(sub, sub.name)}
+                                ${sub.is_completed ? qualityStars(sub.id, sub.quality) : ''}
                             </div>
                         `;
                     });
@@ -1647,12 +1767,20 @@
                                     <span class="task-name">${task.name}</span>
                                     ${subBadge(subMap[task.id])}
                                     ${photoBtn(task, task.name)}
+                                    ${task.is_completed ? qualityStars(task.id, task.quality) : ''}
                                 </div>
                             </div>
                         </div>
                     `;
                 }
             });
+
+            // 底部保存评分按钮
+            html += `<div style="text-align:center;margin-top:16px;">
+                <button class="btn-small" onclick="saveAllQualityScores()" style="background:var(--accent);padding:10px 28px;font-size:14px;">💾 保存今日评分</button>
+                <span id="qualitySaveMsg" style="margin-left:10px;font-size:13px;color:var(--primary);"></span>
+            </div>`;
+
             container.innerHTML = html || '<div class="empty-state"><div class="empty-icon">📋</div><p>当天无打卡任务</p></div>';
         }
 
@@ -2158,6 +2286,260 @@
             </div>`;
 
             container.innerHTML = html;
+        }
+
+        // ============ 质量评分（积分系统） ============
+        const qualityScores = {}; // { taskId: quality }
+
+        function setQuality(taskId, quality) {
+            qualityScores[taskId] = quality;
+            // 更新 UI
+            document.querySelectorAll(`.q-star[data-task="${taskId}"]`).forEach(star => {
+                const q = parseInt(star.dataset.quality);
+                star.classList.toggle('active', q <= quality);
+            });
+        }
+
+        async function saveAllQualityScores() {
+            const date = document.getElementById('checkinDate').value;
+            if (!date) return;
+
+            const scores = Object.entries(qualityScores).map(([task_id, quality]) => ({
+                task_id: parseInt(task_id),
+                quality
+            }));
+
+            if (scores.length === 0) {
+                alert('请先为已完成的任务评分');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/checkins/quality`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ date, scores, student_id: studentId })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('qualitySaveMsg').textContent = `✓ 已保存，今日获得 ${data.daily_total} 分`;
+                    setTimeout(() => {
+                        document.getElementById('qualitySaveMsg').textContent = '';
+                    }, 3000);
+                } else {
+                    alert('保存失败');
+                }
+            } catch (e) {
+                console.error('保存评分失败', e);
+                alert('保存失败');
+            }
+        }
+
+        // ============ 积分管理页面 ============
+        async function loadPointsPage() {
+            try {
+                // 获取余额
+                const balanceRes = await fetch(`${API_BASE}/points/balance?student_id=${studentId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const balanceData = await balanceRes.json();
+                document.getElementById('pointsBalance').textContent = `${balanceData.balance} 分`;
+
+                // 获取流水
+                const ledgerRes = await fetch(`${API_BASE}/points/ledger?student_id=${studentId}&limit=50`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const ledger = await ledgerRes.json();
+
+                const container = document.getElementById('pointsLedger');
+                if (ledger.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>暂无积分记录</p></div>';
+                } else {
+                    container.innerHTML = ledger.map(entry => {
+                        const icon = entry.points > 0 ? '🎉' : '🎁';
+                        const color = entry.points > 0 ? 'var(--primary)' : 'var(--accent)';
+                        const sign = entry.points > 0 ? '+' : '';
+                        return `
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--border);">
+                                <div>
+                                    <div style="font-size:14px;font-weight:500;">${icon} ${entry.description}</div>
+                                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${new Date(entry.created_at).toLocaleString('zh-CN')}</div>
+                                </div>
+                                <div style="font-size:16px;font-weight:600;color:${color};">${sign}${entry.points}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (e) {
+                console.error('加载积分页面失败', e);
+            }
+        }
+
+        async function checkWeeklyBonus() {
+            try {
+                const res = await fetch(`${API_BASE}/points/weekly-check?student_id=${studentId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                const container = document.getElementById('weeklyBonusResult');
+                container.style.display = 'block';
+
+                if (data.eligible) {
+                    container.innerHTML = `
+                        <div style="background:var(--primary-light);padding:16px;border-radius:8px;border-left:4px solid var(--primary);">
+                            <div style="font-size:15px;font-weight:600;color:var(--primary);margin-bottom:8px;">🎉 周全勤奖励已发放！</div>
+                            <div style="font-size:14px;">本周获得 <strong>+10 分</strong>，当前余额 <strong>${data.balance} 分</strong></div>
+                        </div>
+                    `;
+                    loadPointsPage(); // 刷新页面
+                } else {
+                    container.innerHTML = `
+                        <div style="background:var(--accent-light);padding:16px;border-radius:8px;border-left:4px solid var(--accent);">
+                            <div style="font-size:15px;font-weight:600;color:var(--accent);margin-bottom:8px;">📋 本周全勤检查</div>
+                            <div style="font-size:14px;">${data.reason}</div>
+                            ${data.daily_details ? `<div style="margin-top:8px;font-size:13px;color:var(--text-secondary);">
+                                ${data.daily_details.map(d => `${d.date}: ${d.status === 'qualified' ? '✓ 达标' : d.status === 'exempt' ? '⚠ 豁免' : '✗ 未达标'} (${d.count}项)`).join('<br>')}
+                            </div>` : ''}
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                console.error('检查全勤失败', e);
+                alert('检查失败');
+            }
+        }
+
+        // ============ 奖励配置页面 ============
+        let editingRewardId = null;
+
+        async function loadRewardsPage() {
+            try {
+                const res = await fetch(`${API_BASE}/rewards`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const rewards = await res.json();
+
+                const container = document.getElementById('rewardsList');
+                if (rewards.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>暂无奖励配置</p></div>';
+                } else {
+                    container.innerHTML = rewards.map(reward => `
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid var(--border);">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <div style="font-size:32px;">${reward.icon}</div>
+                                <div>
+                                    <div style="font-size:15px;font-weight:500;">${reward.name}</div>
+                                    <div style="font-size:13px;color:var(--text-muted);margin-top:2px;">${reward.description || ''}</div>
+                                    <div style="font-size:14px;font-weight:600;color:var(--accent);margin-top:4px;">${reward.cost} 分</div>
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <button class="btn-small secondary" onclick="editReward(${reward.id})">编辑</button>
+                                <button class="btn-small danger" onclick="deleteReward(${reward.id})">删除</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('加载奖励列表失败', e);
+            }
+        }
+
+        function showAddRewardModal() {
+            editingRewardId = null;
+            document.getElementById('rewardModalTitle').textContent = '新增奖励';
+            document.getElementById('rewardName').value = '';
+            document.getElementById('rewardCost').value = '';
+            document.getElementById('rewardIcon').value = '';
+            document.getElementById('rewardDesc').value = '';
+            document.getElementById('rewardModal').classList.add('active');
+        }
+
+        async function editReward(id) {
+            try {
+                const res = await fetch(`${API_BASE}/rewards`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const rewards = await res.json();
+                const reward = rewards.find(r => r.id === id);
+                if (!reward) return;
+
+                editingRewardId = id;
+                document.getElementById('rewardModalTitle').textContent = '编辑奖励';
+                document.getElementById('rewardName').value = reward.name;
+                document.getElementById('rewardCost').value = reward.cost;
+                document.getElementById('rewardIcon').value = reward.icon;
+                document.getElementById('rewardDesc').value = reward.description || '';
+                document.getElementById('rewardModal').classList.add('active');
+            } catch (e) {
+                console.error('加载奖励失败', e);
+            }
+        }
+
+        function closeRewardModal() {
+            document.getElementById('rewardModal').classList.remove('active');
+            editingRewardId = null;
+        }
+
+        async function saveReward() {
+            const name = document.getElementById('rewardName').value.trim();
+            const cost = parseInt(document.getElementById('rewardCost').value);
+            const icon = document.getElementById('rewardIcon').value.trim() || '🎁';
+            const description = document.getElementById('rewardDesc').value.trim();
+
+            if (!name || !cost || cost < 1) {
+                alert('请填写完整的奖励名称和积分');
+                return;
+            }
+
+            try {
+                const url = editingRewardId ? `${API_BASE}/rewards/${editingRewardId}` : `${API_BASE}/rewards`;
+                const method = editingRewardId ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ name, cost, icon, description })
+                });
+
+                if (res.ok) {
+                    closeRewardModal();
+                    loadRewardsPage();
+                } else {
+                    alert('保存失败');
+                }
+            } catch (e) {
+                console.error('保存奖励失败', e);
+                alert('保存失败');
+            }
+        }
+
+        async function deleteReward(id) {
+            if (!confirm('确定要删除这个奖励吗？')) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/rewards/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    loadRewardsPage();
+                } else {
+                    alert('删除失败');
+                }
+            } catch (e) {
+                console.error('删除奖励失败', e);
+                alert('删除失败');
+            }
         }
     </script>
 </body>

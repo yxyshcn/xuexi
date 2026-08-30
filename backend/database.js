@@ -21,6 +21,9 @@ const defaultData = {
   reports: [],
   messages: [],
   submissions: [],
+  points_ledger: [],
+  rewards: [],
+  redemptions: [],
   _meta: {
     nextId: {
       users: 1,
@@ -31,7 +34,10 @@ const defaultData = {
       books: 1,
       reports: 1,
       messages: 1,
-      submissions: 1
+      submissions: 1,
+      points_ledger: 1,
+      rewards: 1,
+      redemptions: 1
     }
   }
 };
@@ -57,9 +63,19 @@ function loadData() {
 function ensureDefaults(d) {
   let changed = false;
   if (!Array.isArray(d.submissions)) { d.submissions = []; changed = true; }
+  if (!Array.isArray(d.points_ledger)) { d.points_ledger = []; changed = true; }
+  if (!Array.isArray(d.rewards)) { d.rewards = []; changed = true; }
+  if (!Array.isArray(d.redemptions)) { d.redemptions = []; changed = true; }
   if (!d._meta) { d._meta = { nextId: {} }; changed = true; }
   if (!d._meta.nextId) { d._meta.nextId = {}; changed = true; }
   if (!d._meta.nextId.submissions) { d._meta.nextId.submissions = 1; changed = true; }
+  if (!d._meta.nextId.points_ledger) { d._meta.nextId.points_ledger = 1; changed = true; }
+  if (!d._meta.nextId.rewards) { d._meta.nextId.rewards = 1; changed = true; }
+  if (!d._meta.nextId.redemptions) { d._meta.nextId.redemptions = 1; changed = true; }
+  // 确保 checkins 有 quality 字段
+  d.checkins.forEach(c => {
+    if (c.quality === undefined) { c.quality = null; changed = true; }
+  });
   if (changed) saveData();
 }
 
@@ -338,6 +354,90 @@ const db = {
     d.reports.push(newReport);
     saveData();
     return newReport;
+  },
+
+  // 积分
+  addPoints: (entry) => {
+    const d = loadData();
+    const newEntry = { id: getNextId('points_ledger'), ...entry, created_at: new Date().toISOString() };
+    d.points_ledger.push(newEntry);
+    saveData();
+    return newEntry;
+  },
+  getPointsBalance: (studentId) => {
+    const entries = loadData().points_ledger.filter(e => e.student_id === studentId);
+    return entries.reduce((sum, e) => sum + e.points, 0);
+  },
+  getPointsLedger: (studentId, limit = 50) => {
+    return loadData().points_ledger
+      .filter(e => e.student_id === studentId)
+      .sort((a, b) => b.created_at.localeCompare(a.created_at))
+      .slice(0, limit);
+  },
+  getDailyPoints: (studentId, date) => {
+    return loadData().points_ledger.filter(e =>
+      e.student_id === studentId && e.date === date && e.source === 'daily'
+    );
+  },
+  getWeeklyBonus: (studentId, weekStart) => {
+    return loadData().points_ledger.find(e =>
+      e.student_id === studentId && e.source === 'weekly_bonus' && e.week_start === weekStart
+    );
+  },
+
+  // 奖励
+  getRewards: () => {
+    return loadData().rewards.filter(r => r.is_active !== 0).sort((a, b) => a.cost - b.cost);
+  },
+  getAllRewards: () => {
+    return loadData().rewards.sort((a, b) => a.sort_order - b.sort_order);
+  },
+  createReward: (reward) => {
+    const d = loadData();
+    const newReward = { id: getNextId('rewards'), ...reward, is_active: reward.is_active !== undefined ? reward.is_active : 1, created_at: new Date().toISOString() };
+    d.rewards.push(newReward);
+    saveData();
+    return newReward;
+  },
+  updateReward: (id, updates) => {
+    const d = loadData();
+    const idx = d.rewards.findIndex(r => r.id === id);
+    if (idx >= 0) {
+      d.rewards[idx] = { ...d.rewards[idx], ...updates };
+      saveData();
+      return true;
+    }
+    return false;
+  },
+  deleteReward: (id) => {
+    const d = loadData();
+    d.rewards = d.rewards.filter(r => r.id !== id);
+    saveData();
+    return true;
+  },
+
+  // 兑换
+  createRedemption: (redemption) => {
+    const d = loadData();
+    const newRed = { id: getNextId('redemptions'), ...redemption, redeemed_at: new Date().toISOString() };
+    d.redemptions.push(newRed);
+    // 扣减积分（记一笔负数流水）
+    d.points_ledger.push({
+      id: getNextId('points_ledger'),
+      student_id: redemption.student_id,
+      points: -redemption.cost,
+      source: 'redemption',
+      description: `兑换：${redemption.reward_name}`,
+      date: new Date().toISOString().split('T')[0],
+      created_at: new Date().toISOString()
+    });
+    saveData();
+    return newRed;
+  },
+  getRedemptions: (studentId) => {
+    return loadData().redemptions
+      .filter(r => r.student_id === studentId)
+      .sort((a, b) => b.redeemed_at.localeCompare(a.redeemed_at));
   },
 
   // 统计

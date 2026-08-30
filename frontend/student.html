@@ -461,6 +461,136 @@
             border-radius: 2px;
         }
 
+        /* 积分页面样式 */
+        .points-balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin: 16px 20px;
+            color: white;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .points-balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .points-balance-value {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .points-balance-sub {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .reward-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 12px 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .reward-icon {
+            font-size: 36px;
+            flex-shrink: 0;
+        }
+
+        .reward-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .reward-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .reward-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .reward-cost {
+            display: inline-block;
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .reward-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .reward-btn:hover {
+            background: #3d6a4a;
+        }
+
+        .reward-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .redemption-item {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin: 8px 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .redemption-info {
+            flex: 1;
+        }
+
+        .redemption-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .redemption-time {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .redemption-cost {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
         /* 页面 */
         .page { display: none; }
         .page.active { display: block; }
@@ -997,6 +1127,36 @@
             <div id="subjectProgress"></div>
         </div>
 
+        <!-- 积分兑换页 -->
+        <div class="page" id="page-points">
+            <div class="header">
+                <div class="header-top">
+                    <div class="greeting">🏆 我的积分</div>
+                    <div class="header-avatar">⭐</div>
+                </div>
+            </div>
+
+            <div class="points-balance-card">
+                <div class="points-balance-label">当前积分</div>
+                <div class="points-balance-value" id="studentPointsBalance">0</div>
+                <div class="points-balance-sub" id="studentPointsSub">继续努力攒积分吧！</div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">🎁 兑换奖励</div>
+                </div>
+            </div>
+            <div id="rewardShop"></div>
+
+            <div class="section" style="margin-top:20px;">
+                <div class="section-header">
+                    <div class="section-title">📜 兑换记录</div>
+                </div>
+            </div>
+            <div id="redemptionHistory"></div>
+        </div>
+
         <!-- 底部导航 -->
         <div class="bottom-nav">
             <div class="nav-item active" data-page="today" onclick="switchPage('today')">
@@ -1007,9 +1167,9 @@
                 <span class="nav-icon">📸</span>
                 <span class="nav-label">提交</span>
             </div>
-            <div class="nav-item" data-page="reading" onclick="switchPage('reading')">
-                <span class="nav-icon">📖</span>
-                <span class="nav-label">阅读</span>
+            <div class="nav-item" data-page="points" onclick="switchPage('points')">
+                <span class="nav-icon">🏆</span>
+                <span class="nav-label">积分</span>
             </div>
             <div class="nav-item" data-page="progress" onclick="switchPage('progress')">
                 <span class="nav-icon">📊</span>
@@ -1197,6 +1357,7 @@
             document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
             if (page === 'progress') loadProgress();
             if (page === 'reading') loadBooks();
+            if (page === 'points') loadPointsPage();
         }
 
         async function loadTodayTasks() {
@@ -1425,6 +1586,105 @@
                     `;
                 }).join('');
             } catch (e) { console.error(e); }
+        }
+
+        // ============ 积分兑换页面 ============
+        async function loadPointsPage() {
+            // 加载余额
+            try {
+                const res = await fetch(`${API_BASE}/points/balance`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                document.getElementById('studentPointsBalance').textContent = data.balance;
+                if (data.balance >= 160) {
+                    document.getElementById('studentPointsSub').textContent = '太厉害了！可以兑换终极大奖啦！';
+                } else if (data.balance >= 100) {
+                    document.getElementById('studentPointsSub').textContent = '好棒！可以兑换大奖励了！';
+                } else if (data.balance >= 60) {
+                    document.getElementById('studentPointsSub').textContent = '继续加油，中等奖励快到手了！';
+                } else if (data.balance >= 30) {
+                    document.getElementById('studentPointsSub').textContent = '不错哦！可以兑换小奖励了！';
+                } else {
+                    document.getElementById('studentPointsSub').textContent = '继续努力攒积分吧！';
+                }
+            } catch (e) { console.error(e); }
+
+            // 加载奖励商店
+            try {
+                const res = await fetch(`${API_BASE}/rewards`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const rewards = await res.json();
+                const container = document.getElementById('rewardShop');
+                if (rewards.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>暂无奖励</p></div>';
+                } else {
+                    // 获取当前余额
+                    const balanceRes = await fetch(`${API_BASE}/points/balance`, { headers: { 'Authorization': `Bearer ${token}` } });
+                    const balanceData = await balanceRes.json();
+                    const balance = balanceData.balance;
+
+                    container.innerHTML = rewards.map(reward => {
+                        const canRedeem = balance >= reward.cost;
+                        return `
+                            <div class="reward-card">
+                                <div class="reward-icon">${reward.icon}</div>
+                                <div class="reward-info">
+                                    <div class="reward-name">${reward.name}</div>
+                                    <div class="reward-desc">${reward.description || ''}</div>
+                                    <span class="reward-cost">${reward.cost} 分</span>
+                                </div>
+                                <button class="reward-btn" ${canRedeem ? '' : 'disabled'} onclick="redeemReward(${reward.id}, '${reward.name.replace(/'/g, "\\'")}', ${reward.cost})">
+                                    ${canRedeem ? '兑换' : '积分不足'}
+                                </button>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (e) { console.error(e); }
+
+            // 加载兑换记录
+            try {
+                const res = await fetch(`${API_BASE}/points/redemptions`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const redemptions = await res.json();
+                const container = document.getElementById('redemptionHistory');
+                if (redemptions.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>还没有兑换过奖励</p></div>';
+                } else {
+                    container.innerHTML = redemptions.map(red => `
+                        <div class="redemption-item">
+                            <div class="redemption-info">
+                                <div class="redemption-name">🎁 ${red.reward_name}</div>
+                                <div class="redemption-time">${new Date(red.redeemed_at).toLocaleString('zh-CN')}</div>
+                            </div>
+                            <div class="redemption-cost">-${red.cost} 分</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function redeemReward(rewardId, rewardName, cost) {
+            if (!confirm(`确定要兑换「${rewardName}」吗？需要 ${cost} 积分`)) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/points/redeem`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ reward_id: rewardId })
+                });
+
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert(`🎉 兑换成功！\n\n奖励：${rewardName}\n消耗：${cost} 分\n剩余积分：${data.balance} 分`);
+                    loadPointsPage(); // 刷新页面
+                } else {
+                    alert(data.error || '兑换失败');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('兑换失败：网络错误');
+            }
         }
     </script>
 </body>

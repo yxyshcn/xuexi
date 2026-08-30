@@ -661,6 +661,249 @@ app.get('/api/reports', authenticateToken, (req, res) => {
   res.json(reports);
 });
 
+// ============ 初始化默认奖励 ============
+function initDefaultRewards() {
+  const d = loadData();
+  if (d.rewards.length > 0) return; // 已有奖励则不初始化
+  const defaults = [
+    { name: '多看一集动画', description: '可以多看一集喜欢的动画片', icon: '📺', cost: 30, sort_order: 1 },
+    { name: '挑选晚餐菜品', description: '今晚吃什么由你来决定！', icon: '🍽️', cost: 30, sort_order: 2 },
+    { name: '睡前多讲2个故事', description: '今晚可以多听两个睡前故事', icon: '📖', cost: 30, sort_order: 3 },
+    { name: '贴纸套装', description: '精美贴纸一套', icon: '⭐', cost: 30, sort_order: 4 },
+    { name: '小文具', description: '挑选一件喜欢的小文具', icon: '✏️', cost: 60, sort_order: 5 },
+    { name: '小型拼装玩具', description: '小型拼装积木一套', icon: '🧩', cost: 60, sort_order: 6 },
+    { name: '周末户外多玩1小时', description: '周末出去玩可以多玩一小时', icon: '🏃', cost: 60, sort_order: 7 },
+    { name: '课外书一本', description: '挑选一本喜欢的课外书', icon: '📚', cost: 60, sort_order: 8 },
+    { name: '家庭观影', description: '全家一起看电影（你来选）', icon: '🎬', cost: 100, sort_order: 9 },
+    { name: '公园游玩', description: '去公园玩一整天', icon: '🎡', cost: 100, sort_order: 10 },
+    { name: '中等玩具', description: '中等价位的玩具一个', icon: '🎁', cost: 100, sort_order: 11 },
+    { name: '终极大奖', description: '神秘超级大奖！', icon: '👑', cost: 160, sort_order: 12 },
+  ];
+  defaults.forEach(r => db.createReward(r));
+  console.log('✅ 默认奖励初始化完成（12项）');
+}
+
+// ============ 积分 API ============
+
+// 批量评分（家长给某天作业打质量分，同时计算每日积分）
+app.post('/api/checkins/quality', authenticateToken, requireParent, (req, res) => {
+  const { date, scores, student_id } = req.body;
+  // scores: [{ task_id, quality }]  quality: 0/1/2
+  if (!date || !Array.isArray(scores) || !student_id) {
+    return res.status(400).json({ error: '缺少日期、评分或学生ID' });
+  }
+
+  const d = loadData();
+  let dailyTotal = 0;
+  const results = [];
+
+  scores.forEach(s => {
+    const q = parseInt(s.quality);
+    if (q < 0 || q > 2) return;
+    // 更新 checkin 的 quality
+    const checkin = d.checkins.find(c =>
+      c.student_id === parseInt(student_id) && c.task_id === parseInt(s.task_id) && c.date === date
+    );
+    if (checkin) {
+      checkin.quality = q;
+      dailyTotal += q;
+      results.push({ task_id: s.task_id, quality: q });
+    }
+  });
+  saveData();
+
+  // 检查当天是否已有 daily 积分记录，有则更新，没有则新增
+  const existingDaily = d.points_ledger.filter(e =>
+    e.student_id === parseInt(student_id) && e.date === date && e.source === 'daily'
+  );
+  // 删除旧的 daily 记录
+  d.points_ledger = d.points_ledger.filter(e =>
+    !(e.student_id === parseInt(student_id) && e.date === date && e.source === 'daily')
+  );
+  // 写入新的
+  d.points_ledger.push({
+    id: d._meta.nextId.points_ledger++,
+    student_id: parseInt(student_id),
+    points: dailyTotal,
+    source: 'daily',
+    description: `${date} 作业积分（${scores.length}项）`,
+    date,
+    details: results,
+    created_at: new Date().toISOString()
+  });
+  saveData();
+
+  res.json({ success: true, daily_total: dailyTotal, scores: results });
+});
+
+// 查询积分余额
+app.get('/api/points/balance', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const balance = db.getPointsBalance(studentId);
+  res.json({ balance });
+});
+
+// 查询积分流水
+app.get('/api/points/ledger', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const limit = parseInt(req.query.limit) || 50;
+  const ledger = db.getPointsLedger(studentId, limit);
+  res.json(ledger);
+});
+
+// 查询兑换记录
+app.get('/api/points/redemptions', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const redemptions = db.getRedemptions(studentId);
+  res.json(redemptions);
+});
+
+// 兑换奖励
+app.post('/api/points/redeem', authenticateToken, (req, res) => {
+  const { reward_id } = req.body;
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.body.student_id);
+
+  const reward = loadData().rewards.find(r => r.id === parseInt(reward_id));
+  if (!reward || reward.is_active === 0) {
+    return res.status(404).json({ error: '奖励不存在或已下架' });
+  }
+
+  const balance = db.getPointsBalance(studentId);
+  if (balance < reward.cost) {
+    return res.status(400).json({ error: `积分不足，还差 ${reward.cost - balance} 分`, balance, cost: reward.cost });
+  }
+
+  const redemption = db.createRedemption({
+    student_id: studentId,
+    reward_id: reward.id,
+    reward_name: reward.name,
+    cost: reward.cost
+  });
+
+  const newBalance = db.getPointsBalance(studentId);
+  res.json({ success: true, redemption, balance: newBalance });
+});
+
+// 周全勤检查 & 自动发放
+app.get('/api/points/weekly-check', authenticateToken, requireParent, (req, res) => {
+  const studentId = parseInt(req.query.student_id);
+  const d = loadData();
+
+  // 计算本周范围（周一~周日）
+  const now = new Date();
+  const dayOfWeek = now.getDay() || 7;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - dayOfWeek + 1);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  const weekStart = monday.toISOString().split('T')[0];
+  const weekEnd = sunday.toISOString().split('T')[0];
+
+  // 检查是否已发过本周全勤奖
+  const already = db.getWeeklyBonus(studentId, weekStart);
+  if (already) {
+    return res.json({ eligible: false, reason: '本周全勤奖已发放', week_start: weekStart });
+  }
+
+  // 获取本周每天的 checkins
+  const weekCheckins = db.getCheckinsByDateRange(studentId, weekStart, weekEnd);
+  // 按日期分组
+  const byDate = {};
+  weekCheckins.forEach(c => {
+    if (!byDate[c.date]) byDate[c.date] = [];
+    byDate[c.date].push(c);
+  });
+
+  const dates = Object.keys(byDate).sort();
+  if (dates.length === 0) {
+    return res.json({ eligible: false, reason: '本周暂无打卡记录', week_start: weekStart });
+  }
+
+  // 判定：每天是否"每项作业拿到基础得分"（quality >= 1）
+  // 允许1天豁免（那天可以没记录或quality不达标）
+  let qualifiedDays = 0;
+  let exemptUsed = false;
+  const dailyDetails = [];
+
+  dates.forEach(date => {
+    const dayCheckins = byDate[date];
+    const allQualified = dayCheckins.every(c => c.quality !== null && c.quality >= 1);
+    if (allQualified) {
+      qualifiedDays++;
+      dailyDetails.push({ date, status: 'qualified', count: dayCheckins.length });
+    } else {
+      if (!exemptUsed) {
+        exemptUsed = true;
+        dailyDetails.push({ date, status: 'exempt', count: dayCheckins.length });
+      } else {
+        dailyDetails.push({ date, status: 'failed', count: dayCheckins.length });
+      }
+    }
+  });
+
+  // 没有打卡记录的天不算
+  const eligible = qualifiedDays >= 6;
+
+  if (eligible) {
+    // 自动发放10分
+    db.addPoints({
+      student_id: studentId,
+      points: 10,
+      source: 'weekly_bonus',
+      description: `周全勤奖励（${weekStart} ~ ${weekEnd}）`,
+      date: weekEnd,
+      week_start: weekStart,
+      details: dailyDetails
+    });
+    const balance = db.getPointsBalance(studentId);
+    res.json({ eligible: true, bonus: 10, balance, week_start: weekStart, daily_details: dailyDetails });
+  } else {
+    res.json({ eligible: false, reason: `全勤天数不足（${qualifiedDays}/6）`, week_start: weekStart, daily_details: dailyDetails });
+  }
+});
+
+// 获取某天的质量评分详情
+app.get('/api/checkins/quality/:date', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const date = req.params.date;
+  const checkins = db.getCheckins(studentId, date);
+  const scored = checkins.filter(c => c.quality !== null && c.quality !== undefined);
+  const unscored = checkins.filter(c => c.quality === null || c.quality === undefined);
+  res.json({ date, scored, unscored, total: checkins.length });
+});
+
+// ============ 奖励管理 API ============
+
+app.get('/api/rewards', authenticateToken, (req, res) => {
+  const rewards = db.getAllRewards();
+  res.json(rewards);
+});
+
+app.post('/api/rewards', authenticateToken, requireParent, (req, res) => {
+  const { name, description, icon, cost, sort_order } = req.body;
+  if (!name || !cost) return res.status(400).json({ error: '奖励名称和积分不能为空' });
+  const reward = db.createReward({ name, description: description || '', icon: icon || '🎁', cost: parseInt(cost), sort_order: sort_order || 0 });
+  res.json(reward);
+});
+
+app.put('/api/rewards/:id', authenticateToken, requireParent, (req, res) => {
+  const { name, description, icon, cost, sort_order, is_active } = req.body;
+  const updates = {};
+  if (name !== undefined) updates.name = name;
+  if (description !== undefined) updates.description = description;
+  if (icon !== undefined) updates.icon = icon;
+  if (cost !== undefined) updates.cost = parseInt(cost);
+  if (sort_order !== undefined) updates.sort_order = sort_order;
+  if (is_active !== undefined) updates.is_active = is_active;
+  const success = db.updateReward(parseInt(req.params.id), updates);
+  res.json({ success });
+});
+
+app.delete('/api/rewards/:id', authenticateToken, requireParent, (req, res) => {
+  const success = db.deleteReward(parseInt(req.params.id));
+  res.json({ success });
+});
+
 // ============ 上传/通用错误处理（返回 JSON 而不是 HTML） ============
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
@@ -676,6 +919,7 @@ app.use((err, req, res, next) => {
 // ============ 启动 ============
 
 loadData(); // 初始化数据库
+initDefaultRewards(); // 初始化默认奖励
 
 app.listen(PORT, () => {
   console.log(`🚀 小石榴学习管理系统后端运行在 http://localhost:${PORT}`);
