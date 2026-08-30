@@ -87,6 +87,8 @@ async function gradeWithMiniMax(imagePath) {
         },
         body: JSON.stringify({
           model: 'MiniMax-M3',
+          // 关闭思考推理，确保 token 全部用于 JSON 输出（否则长推理会截断 JSON）
+          thinking: { type: 'disabled' },
           messages: [{
             role: 'user',
             content: [
