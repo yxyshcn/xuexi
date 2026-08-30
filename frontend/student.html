@@ -701,6 +701,112 @@
         .empty-state p {
             font-size: 14px;
         }
+
+        /* ========== 作业拍照提交 ========== */
+        .btn-submit-photo {
+            margin-left: 8px;
+            padding: 5px 12px;
+            font-size: 12px;
+            border: 1.5px solid var(--primary);
+            background: #fff;
+            color: var(--primary);
+            border-radius: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .btn-submit-photo:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .sub-badge {
+            margin-left: 8px;
+            padding: 2px 8px;
+            font-size: 11px;
+            background: #eef2ff;
+            color: #4f46e5;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+
+        .sub-badge.graded {
+            background: #e6f9e9;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #fff;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .modal-box h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .modal-actions button {
+            padding: 8px 18px;
+            font-size: 13px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .modal-actions button.secondary {
+            background: #eee;
+            color: #666;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .submit-preview img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -916,6 +1022,24 @@
         </div>
     </div>
 
+    <!-- 作业提交模态框 -->
+    <div class="modal-overlay" id="submitModal">
+        <div class="modal-box">
+            <h3 id="submitModalTitle">📷 提交作业</h3>
+            <div class="upload-area" onclick="document.getElementById('submitFileInput').click()">
+                <div style="font-size:28px;">📷</div>
+                <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">点击拍照 / 选择照片上传</div>
+                <input type="file" id="submitFileInput" accept="image/*" capture="environment" style="display:none">
+            </div>
+            <div class="submit-preview" id="submitPreview"></div>
+            <div id="submitResult" style="display:none;"></div>
+            <div class="modal-actions">
+                <button class="secondary" onclick="closeSubmitModal()">关闭</button>
+                <button id="submitBtn" onclick="uploadSubmission()">提交作业</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE = '/xuexi/api';
         let token = localStorage.getItem('xuexi_student_token');
@@ -970,6 +1094,86 @@
             location.reload();
         }
 
+        // ============ 作业拍照提交 ============
+        let submitTaskId = null;
+
+        function openSubmitModal(taskId, taskName) {
+            submitTaskId = taskId;
+            document.getElementById('submitModalTitle').textContent = `📷 提交作业：${taskName}`;
+            document.getElementById('submitPreview').innerHTML = '';
+            document.getElementById('submitResult').style.display = 'none';
+            document.getElementById('submitResult').innerHTML = '';
+            document.getElementById('submitFileInput').value = '';
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').textContent = '提交作业';
+            document.getElementById('submitModal').classList.add('active');
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('submitModal').classList.remove('active');
+        }
+
+        document.getElementById('submitFileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                document.getElementById('submitPreview').innerHTML = `<img src="${ev.target.result}" alt="作业预览">`;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        async function uploadSubmission() {
+            const fileInput = document.getElementById('submitFileInput');
+            if (!fileInput.files[0]) { alert('请先选择照片'); return; }
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = '提交中...';
+            const fd = new FormData();
+            fd.append('image', fileInput.files[0]);
+            fd.append('task_id', submitTaskId);
+            fd.append('date', new Date().toISOString().split('T')[0]);
+            try {
+                const res = await fetch(`${API_BASE}/submissions`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: fd
+                });
+                const sub = await res.json();
+                showSubmitResult(sub);
+                loadTodayTasks(); // 刷新今日任务显示已提交状态
+            } catch (e) {
+                alert('提交失败');
+                console.error(e);
+            }
+            btn.disabled = false;
+            btn.textContent = '提交作业';
+        }
+
+        function showSubmitResult(sub) {
+            const box = document.getElementById('submitResult');
+            box.style.display = 'block';
+            const ai = sub.ai_result;
+            if (ai && ai.status === 'graded') {
+                let html = `<div style="margin-top:12px;padding:12px;background:#f6fff6;border:1px solid #d4edda;border-radius:8px;">
+                    <div style="font-size:15px;font-weight:700;color:#2e7d32;">📊 AI 批改结果</div>
+                    <div style="font-size:13px;margin-top:6px;color:#555;">共 ${ai.total || 0} 题 · 答对 ${ai.correct || 0} 题 · 正确率 ${Math.round((ai.accuracy || 0) * 100)}%</div>`;
+                (ai.questions || []).forEach(q => {
+                    html += `<div style="margin-top:6px;font-size:13px;${q.correct ? 'color:#2e7d32;' : 'color:#c0392b;'}">
+                        ${q.correct ? '✅' : '❌'} ${q.q || ''} = ${q.student_answer || '未作答'}
+                        ${q.correct ? '' : `<span style="color:#888;">（正确答案 ${q.correct_answer || '?'}）</span>`}
+                        ${q.note ? `<span style="color:#e67e22;">· ${q.note}</span>` : ''}
+                    </div>`;
+                });
+                html += '</div>';
+                box.innerHTML = html;
+            } else if (ai && ai.status === 'failed') {
+                box.innerHTML = `<div style="margin-top:12px;padding:12px;background:#fff3f3;border:1px solid #f5c6cb;border-radius:8px;font-size:13px;color:#c0392b;">⚠️ AI 批改失败：${ai.error || '未知错误'}。照片已保存，可重新提交。</div>`;
+            } else {
+                box.innerHTML = `<div style="margin-top:12px;padding:12px;background:#f0f7ff;border:1px solid #bee5eb;border-radius:8px;font-size:13px;color:#0c5460;">📷 作业已提交，棒棒哒！</div>`;
+            }
+        }
+
         function switchPage(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -981,9 +1185,31 @@
 
         async function loadTodayTasks() {
             try {
-                const res = await fetch(`${API_BASE}/checkins/today`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
+                const today = new Date().toISOString().split('T')[0];
+                const [taskRes, subRes] = await Promise.all([
+                    fetch(`${API_BASE}/checkins/today`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${API_BASE}/submissions?date=${today}`, { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                const data = await taskRes.json();
+                const submissions = await subRes.json();
                 const container = document.getElementById('taskList');
+
+                // 按任务 id 索引当天提交记录
+                const subMap = {};
+                (submissions || []).forEach(s => { subMap[s.task_id] = s; });
+
+                const subBadge = (sub) => {
+                    if (!sub) return '';
+                    const ai = sub.ai_result;
+                    if (ai && ai.status === 'graded') {
+                        return `<span class="sub-badge graded" title="AI批改：${Math.round(ai.accuracy * 100)}%正确">📷 ${Math.round(ai.accuracy * 100)}分</span>`;
+                    }
+                    return `<span class="sub-badge">📷 已提交</span>`;
+                };
+                const photoBtn = (task, label) => {
+                    if (!task.needs_photo) return '';
+                    return `<button class="btn-submit-photo" onclick="event.stopPropagation();openSubmitModal(${task.id}, '${label.replace(/'/g, "\\'")}')">📷 提交</button>`;
+                };
 
                 // 渲染任务（带子任务的显示为分组）
                 let html = '';
@@ -1007,6 +1233,8 @@
                                     <div class="task-checkbox">${sub.is_completed ? '✓' : ''}</div>
                                     <span class="task-icon">${sub.icon}</span>
                                     <span class="task-name">${sub.name}</span>
+                                    ${subBadge(subMap[sub.id])}
+                                    ${photoBtn(sub, sub.name)}
                                     <span class="task-status ${sub.is_completed ? 'done' : 'pending'}">${sub.is_completed ? '已完成' : '待完成'}</span>
                                 </div>
                             `;
@@ -1019,6 +1247,8 @@
                                 <div class="task-checkbox">${task.is_completed ? '✓' : ''}</div>
                                 <span class="task-icon">${task.icon}</span>
                                 <span class="task-name">${task.name}</span>
+                                ${subBadge(subMap[task.id])}
+                                ${photoBtn(task, task.name)}
                                 <span class="task-status ${task.is_completed ? 'done' : 'pending'}">${task.is_completed ? '已完成' : '待完成'}</span>
                             </div>
                         `;

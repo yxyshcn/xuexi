@@ -20,6 +20,7 @@ const defaultData = {
   books: [],
   reports: [],
   messages: [],
+  submissions: [],
   _meta: {
     nextId: {
       users: 1,
@@ -29,7 +30,8 @@ const defaultData = {
       goals: 1,
       books: 1,
       reports: 1,
-      messages: 1
+      messages: 1,
+      submissions: 1
     }
   }
 };
@@ -47,7 +49,18 @@ function loadData() {
     initData();
     saveData();
   }
+  ensureDefaults(data);
   return data;
+}
+
+// 兼容旧数据文件：补齐新增字段
+function ensureDefaults(d) {
+  let changed = false;
+  if (!Array.isArray(d.submissions)) { d.submissions = []; changed = true; }
+  if (!d._meta) { d._meta = { nextId: {} }; changed = true; }
+  if (!d._meta.nextId) { d._meta.nextId = {}; changed = true; }
+  if (!d._meta.nextId.submissions) { d._meta.nextId.submissions = 1; changed = true; }
+  if (changed) saveData();
 }
 
 function saveData() {
@@ -278,6 +291,34 @@ const db = {
   },
   getUnreadMessageCount: () => {
     return loadData().messages.filter(m => m.is_read === 0).length;
+  },
+
+  // 作业提交
+  createSubmission: (sub) => {
+    const d = loadData();
+    const newSub = { id: getNextId('submissions'), ...sub, created_at: new Date().toISOString() };
+    d.submissions.push(newSub);
+    saveData();
+    return newSub;
+  },
+  updateSubmission: (id, updates) => {
+    const d = loadData();
+    const idx = d.submissions.findIndex(s => s.id === id);
+    if (idx >= 0) {
+      d.submissions[idx] = { ...d.submissions[idx], ...updates };
+      saveData();
+      return d.submissions[idx];
+    }
+    return null;
+  },
+  getSubmissions: (studentId, filters = {}) => {
+    let results = loadData().submissions.filter(s => s.student_id === studentId);
+    if (filters.task_id) results = results.filter(s => s.task_id === filters.task_id);
+    if (filters.date) results = results.filter(s => s.date === filters.date);
+    return results.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  },
+  getSubmissionById: (id) => {
+    return loadData().submissions.find(s => s.id === id);
   },
 
   // 周报

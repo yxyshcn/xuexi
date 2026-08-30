@@ -39,6 +39,68 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
+// ============ AI 批改（MiniMax-M3 视觉） ============
+async function gradeWithMiniMax(imagePath) {
+  const apiKey = process.env.MINIMAX_CN_API_KEY;
+  if (!apiKey) {
+    return { status: 'failed', error: 'MINIMAX_CN_API_KEY 未配置' };
+  }
+  try {
+    const b64 = fs.readFileSync(imagePath).toString('base64');
+    const lower = imagePath.toLowerCase();
+    const mime = lower.endsWith('.png') ? 'image/png'
+      : lower.endsWith('.webp') ? 'image/webp'
+      : lower.endsWith('.gif') ? 'image/gif'
+      : 'image/jpeg';
+
+    const prompt = `你是一位小学数学老师，负责批改学生的计算练习作业照片。
+请识别照片中的每一道计算题，并判断学生写的答案是否正确。
+要求：
+1. 逐题列出：题目、学生答案、正确答案、是否正确
+2. 如果题目或答案模糊看不清，correct 标记为 false，并在 note 里写"看不清"
+3. 只输出 JSON，不要输出其他文字，格式：
+{
+  "questions": [
+    {"q": "12+34", "student_answer": "46", "correct_answer": "46", "correct": true, "note": ""}
+  ],
+  "total": 10,
+  "correct": 8,
+  "accuracy": 0.8
+}
+其中 total 为题目总数，correct 为答对数量，accuracy 为正确率(0-1)。`;
+
+    const resp = await fetch('https://api.minimaxi.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'MiniMax-M3',
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: `data:${mime};base64,${b64}` } }
+          ]
+        }],
+        max_tokens: 1500
+      })
+    });
+    const data = await resp.json();
+    const text = data?.choices?.[0]?.message?.content || '';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return { status: 'failed', error: 'AI 返回格式无法解析', raw: text.slice(0, 500) };
+    }
+    const result = JSON.parse(jsonMatch[0]);
+    return { status: 'graded', ...result };
+  } catch (e) {
+    console.error('AI 批改失败', e);
+    return { status: 'failed', error: e.message };
+  }
+}
+
 // JWT 认证中间件
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -285,6 +347,51 @@ app.delete('/api/checkins/:date/:taskId', authenticateToken, requireParent, (req
   const studentId = parseInt(req.query.student_id);
   const success = db.removeCheckin(studentId, parseInt(req.params.taskId), req.params.date);
   res.json({ success });
+});
+
+// ============ 作业提交 API ============
+
+// 提交作业（拍照上传；若任务标记 needs_ai_grading，自动 AI 批改）
+app.post('/api/submissions', authenticateToken, upload.single('image'), async (req, res) => {
+  const { task_id, date } = req.body;
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.body.student_id);
+
+  if (!req.file) return res.status(400).json({ error: '请上传作业照片' });
+  if (!task_id || !date) return res.status(400).json({ error: '缺少任务或日期' });
+
+  const imagePath = `/uploads/${req.file.filename}`;
+  const fullPath = req.file.path;
+
+  // 查任务是否标记 AI 批改
+  const task = db.getTaskById(parseInt(task_id));
+  const needsAi = task && task.needs_ai_grading === 1;
+
+  let aiResult = null;
+  if (needsAi) {
+    aiResult = await gradeWithMiniMax(fullPath);
+  }
+
+  const submission = db.createSubmission({
+    student_id: studentId,
+    task_id: parseInt(task_id),
+    date,
+    image_path: imagePath,
+    needs_ai_grading: needsAi ? 1 : 0,
+    ai_result: aiResult,
+    is_read: 0
+  });
+
+  res.json(submission);
+});
+
+// 查询作业提交记录（按学生，可过滤任务/日期）
+app.get('/api/submissions', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const filters = {};
+  if (req.query.task_id) filters.task_id = parseInt(req.query.task_id);
+  if (req.query.date) filters.date = req.query.date;
+  const submissions = db.getSubmissions(studentId, filters);
+  res.json(submissions);
 });
 
 // ============ 错题 API ============
