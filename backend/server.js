@@ -374,6 +374,30 @@ app.delete('/api/checkins/:date/:taskId', authenticateToken, requireParent, (req
 
 // ============ 作业提交 API ============
 
+// AI 批改后把错题自动加入错题本（同学生同题且未订正的不重复添加）
+function addMistakesFromGrading(studentId, task, submission) {
+  const ai = submission.ai_result;
+  if (!ai || ai.status !== 'graded' || !Array.isArray(ai.questions)) return 0;
+  let added = 0;
+  ai.questions.forEach(q => {
+    if (q.correct) return;
+    const description = (q.q || '').trim();
+    if (!description) return;
+    if (db.hasMistake(studentId, task.name, description)) return;
+    db.createMistake({
+      student_id: studentId,
+      subject: task.subject || '其他',
+      topic: task.name,
+      description,
+      error_reason: `学生答案：${q.student_answer || '未作答'}`,
+      image_path: submission.image_path,
+      is_corrected: 0
+    });
+    added++;
+  });
+  return added;
+}
+
 // 提交作业（拍照上传；若任务标记 needs_ai_grading，自动 AI 批改）
 app.post('/api/submissions', authenticateToken, upload.single('image'), async (req, res) => {
   const { task_id, date } = req.body;
@@ -404,7 +428,10 @@ app.post('/api/submissions', authenticateToken, upload.single('image'), async (r
     is_read: 0
   });
 
-  res.json(submission);
+  // AI 批改后自动把错题加入错题本
+  const mistakeAdded = needsAi ? addMistakesFromGrading(studentId, task, submission) : 0;
+
+  res.json({ ...submission, mistake_added: mistakeAdded });
 });
 
 // 查询作业提交记录（按学生，可过滤任务/日期）

@@ -1159,18 +1159,30 @@
             box.style.display = 'block';
             const ai = sub.ai_result;
             if (ai && ai.status === 'graded') {
-                let html = `<div style="margin-top:12px;padding:12px;background:#f6fff6;border:1px solid #d4edda;border-radius:8px;">
-                    <div style="font-size:15px;font-weight:700;color:#2e7d32;">📊 AI 批改结果</div>
-                    <div style="font-size:13px;margin-top:6px;color:#555;">共 ${ai.total || 0} 题 · 答对 ${ai.correct || 0} 题 · 正确率 ${Math.round((ai.accuracy || 0) * 100)}%</div>`;
-                (ai.questions || []).forEach(q => {
-                    html += `<div style="margin-top:6px;font-size:13px;${q.correct ? 'color:#2e7d32;' : 'color:#c0392b;'}">
-                        ${q.correct ? '✅' : '❌'} ${q.q || ''} = ${q.student_answer || '未作答'}
-                        ${q.correct ? '' : `<span style="color:#888;">（正确答案 ${q.correct_answer || '?'}）</span>`}
-                        ${q.note ? `<span style="color:#e67e22;">· ${q.note}</span>` : ''}
+                const total = ai.total || 0;
+                const correct = ai.correct || 0;
+                const wrong = (ai.questions || []).filter(q => !q.correct);
+                if (total > 0 && correct === total) {
+                    // 全对
+                    box.innerHTML = `<div style="margin-top:12px;padding:16px;background:#f6fff6;border:1px solid #d4edda;border-radius:8px;text-align:center;">
+                        <div style="font-size:22px;">🎉</div>
+                        <div style="font-size:16px;font-weight:700;color:#2e7d32;margin-top:4px;">太棒了！全部答对（${total}题）！</div>
+                        <div style="font-size:13px;color:#888;margin-top:4px;">继续保持哦~</div>
                     </div>`;
-                });
-                html += '</div>';
-                box.innerHTML = html;
+                } else {
+                    // 有错误：只显示错题，不给答案
+                    let html = `<div style="margin-top:12px;padding:12px;background:#fff8f3;border:1px solid #f5d5b5;border-radius:8px;">
+                        <div style="font-size:14px;font-weight:700;color:#e67e22;">📊 共 ${total} 题 · 答对 ${correct} 题${wrong.length ? ` · ${wrong.length} 题需要订正` : ''}</div>
+                        <div style="font-size:12px;color:#aaa;margin-top:2px;">${sub.mistake_added ? '📝 错题已加入错题本' : '订正后记得重新提交哦'}</div>`;
+                    wrong.forEach(q => {
+                        html += `<div style="margin-top:8px;padding:8px 10px;background:#fff;border:1px solid #f5c6cb;border-radius:6px;font-size:13px;color:#c0392b;">
+                            ❌ ${q.q || ''} <span style="color:#e67e22;">= ${q.student_answer || '未作答'}</span>
+                            ${q.note ? `<div style="font-size:12px;color:#aaa;margin-top:2px;">${q.note}</div>` : ''}
+                        </div>`;
+                    });
+                    html += '</div>';
+                    box.innerHTML = html;
+                }
             } else if (ai && ai.status === 'failed') {
                 box.innerHTML = `<div style="margin-top:12px;padding:12px;background:#fff3f3;border:1px solid #f5c6cb;border-radius:8px;font-size:13px;color:#c0392b;">⚠️ AI 批改失败：${ai.error || '未知错误'}。照片已保存，可重新提交。</div>`;
             } else {

@@ -191,6 +191,13 @@ const db = {
     if (filters.is_corrected !== undefined) results = results.filter(m => m.is_corrected === filters.is_corrected);
     return results.sort((a, b) => b.created_at.localeCompare(a.created_at));
   },
+  hasMistake: (studentId, topic, description) => {
+    const norm = (s) => (s || '').replace(/\s+/g, '');
+    const n = norm(description);
+    return loadData().mistakes.some(m =>
+      m.student_id === studentId && m.topic === topic && norm(m.description) === n && m.is_corrected === 0
+    );
+  },
   createMistake: (mistake) => {
     const d = loadData();
     const newMistake = { id: getNextId('mistakes'), ...mistake, created_at: new Date().toISOString() };
