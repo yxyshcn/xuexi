@@ -4,41 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小石榴学习管理台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --bg: #f5f5f0;
-            --card: #ffffff;
-            --border: #e8e4dc;
-            --text: #2d2d2d;
-            --text-secondary: #6b6b6b;
-            --text-muted: #999999;
-            --primary: #4a7c59;
-            --primary-light: #e8f0eb;
-            --accent: #d4a574;
-            --accent-light: #faf3eb;
-            --danger: #c0392b;
-            --danger-light: #fceae8;
-            --info: #5b8fa8;
-            --info-light: #e8f2f7;
-            --purple: #7c6da0;
-            --purple-light: #f0edf5;
-            --sidebar-bg: #2c3e2d;
-            --sidebar-text: #b8c9b9;
-            --sidebar-active: #4a7c59;
-            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --radius: 12px;
-            --radius-sm: 8px;
+            /* 动森色板 - Animal Crossing Palette */
+            --bg: #f8f8f0;
+            --card: rgb(247, 243, 223);
+            --border: #e8e2d6;
+            --text: #725d42;
+            --text-secondary: #8a7b66;
+            --text-muted: #9f927d;
+            --primary: #19c8b9;
+            --primary-hover: #3dd4c6;
+            --primary-active: #50b9ab;
+            --primary-light: #e6f9f6;
+            --accent: #f7cd67;
+            --accent-light: #fdf6e3;
+            --danger: #fc736d;
+            --danger-light: #fde8e7;
+            --info: #889df0;
+            --info-light: #e8ecfc;
+            --purple: #b77dee;
+            --purple-light: #f3eafc;
+            --sidebar-bg: #5a4a3a;
+            --sidebar-text: #d4c9b4;
+            --sidebar-active: #19c8b9;
+            --shadow: 0 2px 4px 0 rgba(61, 52, 40, 0.06);
+            --shadow-md: 0 3px 10px 0 rgba(61, 52, 40, 0.10);
+            --radius: 20px;
+            --radius-sm: 16px;
+            --btn-3d-shadow: #bdaea0;
+            --focus-yellow: #ffcc00;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            font-family: Nunito, 'Noto Sans SC', 'Zen Maru Gothic', 'HarmonyOS Sans SC', -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             line-height: 1.5;
+            font-weight: 500;
+            letter-spacing: 0.01em;
         }
 
         /* ========== 登录页 ========== */
@@ -47,15 +58,16 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #e8f0eb 0%, #faf3eb 50%, #f5f0e8 100%);
+            background: linear-gradient(135deg, #e6f9f6 0%, #fdf6e3 50%, #f8f8f0 100%);
         }
 
         .login-card {
-            background: white;
-            border-radius: 20px;
+            background: rgb(247, 243, 223);
+            border-radius: 24px;
             padding: 48px 40px;
             width: 400px;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 8px 24px rgba(114, 93, 66, 0.15);
+            border: 2px solid var(--border);
         }
 
         .login-card .logo {
@@ -67,7 +79,7 @@
             width: 64px;
             height: 64px;
             background: var(--primary-light);
-            border-radius: 16px;
+            border-radius: 20px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -77,7 +89,7 @@
 
         .login-card h1 {
             font-size: 22px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text);
             margin-bottom: 4px;
         }
@@ -94,26 +106,27 @@
         .form-group label {
             display: block;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-secondary);
             margin-bottom: 6px;
         }
 
         .form-input {
             width: 100%;
-            padding: 12px 16px;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 50px;
             font-size: 15px;
-            transition: all 0.2s;
-            background: #fafafa;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #fffbe7;
+            color: var(--text);
         }
 
         .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+            outline: 2px solid var(--focus-yellow);
+            outline-offset: 2px;
+            background: #fff;
         }
 
         .btn-primary {
@@ -122,17 +135,24 @@
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 50px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 0 0 var(--btn-3d-shadow);
+            letter-spacing: 0.02em;
         }
 
         .btn-primary:hover {
-            background: #3d6a4a;
+            background: var(--primary-hover);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.3);
+            box-shadow: 0 6px 0 0 var(--btn-3d-shadow);
+        }
+
+        .btn-primary:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 0 var(--btn-3d-shadow);
         }
 
         .login-error {
@@ -165,6 +185,7 @@
             display: flex;
             flex-direction: column;
             z-index: 100;
+            border-radius: 0 24px 24px 0;
         }
 
         .sidebar-brand {
@@ -174,7 +195,7 @@
 
         .sidebar-brand h2 {
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             color: white;
             display: flex;
             align-items: center;
@@ -182,14 +203,14 @@
         }
 
         .sidebar-brand .brand-icon {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             background: var(--primary);
-            border-radius: 8px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 18px;
         }
 
         .sidebar-user {
@@ -203,20 +224,20 @@
         .user-avatar {
             width: 36px;
             height: 36px;
-            background: var(--primary);
+            background: var(--accent);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
-            color: white;
-            font-weight: 600;
+            color: #725d42;
+            font-weight: 700;
         }
 
         .user-info .user-name {
             font-size: 14px;
             color: white;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .user-info .user-role {
@@ -235,49 +256,48 @@
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: rgba(255,255,255,0.3);
-            font-weight: 600;
+            color: rgba(255,255,255,0.35);
+            font-weight: 700;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
             padding: 10px 20px;
+            margin: 1px 8px;
             cursor: pointer;
             transition: all 0.15s;
             font-size: 14px;
+            font-weight: 600;
             color: var(--sidebar-text);
-            border-left: 3px solid transparent;
+            border-radius: 12px;
             gap: 12px;
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.08);
             color: white;
         }
 
         .nav-item.active {
-            background: rgba(74, 124, 89, 0.2);
+            background: rgba(25, 200, 185, 0.25);
             color: white;
-            border-left-color: var(--primary);
         }
 
         .nav-item.nav-subitem {
             padding-left: 48px;
             font-size: 13px;
-            color: rgba(184, 201, 185, 0.75);
-            border-left: 3px solid transparent;
+            color: rgba(212, 201, 180, 0.75);
         }
 
         .nav-item.nav-subitem:hover {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.08);
             color: white;
         }
 
         .nav-item.nav-subitem.active {
-            background: rgba(74, 124, 89, 0.15);
+            background: rgba(247, 205, 103, 0.2);
             color: white;
-            border-left-color: var(--accent);
         }
 
         .nav-item .nav-icon {
@@ -291,9 +311,9 @@
             background: var(--danger);
             color: white;
             font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 700;
         }
 
         .sidebar-footer {
@@ -314,8 +334,8 @@
         }
 
         .topbar {
-            background: white;
-            border-bottom: 1px solid var(--border);
+            background: rgb(247, 243, 223);
+            border-bottom: 2px solid var(--border);
             padding: 16px 32px;
             display: flex;
             align-items: center;
@@ -327,7 +347,8 @@
 
         .topbar-title h1 {
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
+            color: var(--text);
         }
 
         .topbar-title .breadcrumb {
@@ -345,9 +366,10 @@
         .topbar-date {
             font-size: 13px;
             color: var(--text-secondary);
-            padding: 6px 12px;
-            background: var(--bg);
-            border-radius: 6px;
+            padding: 6px 14px;
+            background: #fffbe7;
+            border-radius: 50px;
+            font-weight: 600;
         }
 
         .page-content {
@@ -379,11 +401,16 @@
         }
 
         .kpi-card {
-            background: white;
-            border-radius: var(--radius);
+            background: rgb(247, 243, 223);
+            border-radius: 20px;
             padding: 20px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
         }
 
         .kpi-card .kpi-header {
@@ -396,7 +423,7 @@
         .kpi-card .kpi-icon {
             width: 40px;
             height: 40px;
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -410,9 +437,9 @@
 
         .kpi-card .kpi-trend {
             font-size: 12px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-weight: 500;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-weight: 600;
         }
 
         .kpi-card .kpi-trend.up { background: var(--primary-light); color: var(--primary); }
@@ -420,7 +447,7 @@
 
         .kpi-card .kpi-value {
             font-size: 28px;
-            font-weight: 700;
+            font-weight: 800;
             color: var(--text);
             line-height: 1.2;
         }
@@ -429,20 +456,26 @@
             font-size: 13px;
             color: var(--text-muted);
             margin-top: 4px;
+            font-weight: 500;
         }
 
         /* 卡片 */
         .card {
-            background: white;
-            border-radius: var(--radius);
+            background: rgb(247, 243, 223);
+            border-radius: 20px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             overflow: hidden;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
         }
 
         .card-header {
             padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 2px dashed var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -450,10 +483,11 @@
 
         .card-header h3 {
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 8px;
+            color: var(--text);
         }
 
         .card-header .card-action {
@@ -461,6 +495,7 @@
             color: var(--primary);
             cursor: pointer;
             text-decoration: none;
+            font-weight: 600;
         }
 
         .card-header .card-action:hover {
@@ -516,15 +551,15 @@
         }
 
         .goal-bar {
-            height: 6px;
-            background: #f0f0f0;
-            border-radius: 3px;
+            height: 8px;
+            background: #f0ece2;
+            border-radius: 4px;
             overflow: hidden;
         }
 
         .goal-bar .fill {
             height: 100%;
-            border-radius: 3px;
+            border-radius: 4px;
             transition: width 0.6s ease;
         }
 
@@ -535,7 +570,7 @@
 
         .goal-percent {
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             width: 42px;
             text-align: right;
             flex-shrink: 0;
@@ -553,14 +588,14 @@
             padding: 12px 20px;
             gap: 12px;
             cursor: pointer;
-            transition: background 0.15s;
-            border-bottom: 1px solid #f5f5f5;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 1px dashed rgba(232, 226, 214, 0.6);
         }
 
         .checkin-item:last-child { border-bottom: none; }
 
         .checkin-item:hover {
-            background: #fafafa;
+            background: rgba(25, 200, 185, 0.08);
         }
 
         .checkin-item.completed {
@@ -570,18 +605,24 @@
         .check-box {
             width: 22px;
             height: 22px;
-            border: 2px solid #d0d0d0;
-            border-radius: 6px;
+            border: 2.5px solid #c4b89e;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.15s;
             flex-shrink: 0;
+            background: rgb(247, 243, 223);
+        }
+
+        .check-box:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
         }
 
         .checkin-item.completed .check-box {
             background: var(--primary);
-            border-color: var(--primary);
+            border-color: var(--primary-active);
             color: white;
             font-size: 12px;
         }
@@ -593,6 +634,7 @@
         .checkin-item .task-name {
             flex: 1;
             font-size: 14px;
+            font-weight: 500;
         }
 
         .checkin-item.completed .task-name {
@@ -605,51 +647,6 @@
             color: var(--text-muted);
         }
 
-        /* 错题分布 */
-        .mistake-chart {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .mistake-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .mistake-row .subject {
-            width: 40px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .mistake-row .bar-wrap {
-            flex: 1;
-            height: 20px;
-            background: #f5f5f5;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .mistake-row .bar-fill {
-            height: 100%;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            padding-left: 8px;
-            font-size: 11px;
-            color: white;
-            font-weight: 500;
-        }
-
-        .mistake-row .count {
-            width: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: right;
-        }
-
         /* 留言区 */
         .message-list {
             max-height: 200px;
@@ -658,7 +655,7 @@
 
         .message-item {
             padding: 12px 0;
-            border-bottom: 1px solid #f5f5f5;
+            border-bottom: 1px dashed rgba(232, 226, 214, 0.6);
         }
 
         .message-item:last-child { border-bottom: none; }
@@ -667,6 +664,7 @@
             font-size: 14px;
             color: var(--text);
             line-height: 1.5;
+            font-weight: 500;
         }
 
         .message-item .msg-time {
@@ -679,34 +677,49 @@
             display: flex;
             gap: 8px;
             padding-top: 12px;
-            border-top: 1px solid var(--border);
+            border-top: 2px dashed var(--border);
             margin-top: 8px;
         }
 
         .message-input-wrap input {
             flex: 1;
-            padding: 10px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: 8px;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 50px;
             font-size: 13px;
-            background: #fafafa;
+            font-weight: 500;
+            background: #fffbe7;
+            color: var(--text);
         }
 
         .message-input-wrap input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
+            outline: 2px solid var(--focus-yellow);
+            outline-offset: 2px;
+            background: #fff;
         }
 
         .message-input-wrap button {
-            padding: 10px 16px;
+            padding: 10px 18px;
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 50px;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
+            box-shadow: 0 3px 0 0 var(--btn-3d-shadow);
+            transition: all 0.2s;
+        }
+
+        .message-input-wrap button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 0 0 var(--btn-3d-shadow);
+        }
+
+        .message-input-wrap button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 0 0 var(--btn-3d-shadow);
         }
 
         /* 打卡热力图（真实月历模式） */
@@ -721,11 +734,12 @@
             color: var(--text-muted);
             font-size: 12px;
             margin-bottom: 6px;
+            font-weight: 600;
         }
 
         .cal-header .weekend {
-            color: var(--accent);
-            font-weight: 600;
+            color: #6fba2c;
+            font-weight: 700;
         }
 
         .cal-grid {
@@ -736,20 +750,21 @@
 
         .cal-cell {
             aspect-ratio: 1;
-            border-radius: 6px;
-            background: #f0f0f0;
+            border-radius: 8px;
+            background: #f0ece2;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
-            color: #555;
+            font-weight: 500;
+            color: var(--text-secondary);
             position: relative;
             cursor: default;
-            transition: transform 0.1s;
+            transition: transform 0.15s;
         }
 
         .cal-cell:hover {
-            transform: scale(1.08);
+            transform: scale(1.1);
         }
 
         .cal-cell.empty {
@@ -758,18 +773,18 @@
 
         .cal-cell.today {
             box-shadow: inset 0 0 0 2px var(--primary);
-            font-weight: 700;
+            font-weight: 800;
             color: var(--primary);
         }
 
         .cal-cell.weekend {
-            background: #f7f0ea;
+            background: #fdf6e3;
         }
 
-        .cal-cell.level-1 { background: #c8e6c9; }
-        .cal-cell.level-2 { background: #81c784; }
-        .cal-cell.level-3 { background: #4caf50; color: #fff; font-weight: 600; }
-        .cal-cell.level-4 { background: #2e7d32; color: #fff; font-weight: 600; }
+        .cal-cell.level-1 { background: #e6f9f6; }
+        .cal-cell.level-2 { background: #82d5bb; }
+        .cal-cell.level-3 { background: #19c8b9; color: #fff; font-weight: 700; }
+        .cal-cell.level-4 { background: #0a9e92; color: #fff; font-weight: 700; }
 
         .cal-legend {
             display: flex;
@@ -784,14 +799,14 @@
         .cal-legend .legend-dot {
             width: 12px;
             height: 12px;
-            border-radius: 3px;
+            border-radius: 4px;
             display: inline-block;
         }
 
-        .cal-legend .legend-dot.level-1 { background: #c8e6c9; }
-        .cal-legend .legend-dot.level-2 { background: #81c784; }
-        .cal-legend .legend-dot.level-3 { background: #4caf50; }
-        .cal-legend .legend-dot.level-4 { background: #2e7d32; }
+        .cal-legend .legend-dot.level-1 { background: #e6f9f6; }
+        .cal-legend .legend-dot.level-2 { background: #82d5bb; }
+        .cal-legend .legend-dot.level-3 { background: #19c8b9; }
+        .cal-legend .legend-dot.level-4 { background: #0a9e92; }
 
         /* 空状态 */
         .empty-state {
@@ -811,37 +826,68 @@
 
         /* 小按钮 */
         .btn-small {
-            padding: 8px 16px;
+            padding: 8px 18px;
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 50px;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 3px 0 0 var(--btn-3d-shadow);
+            letter-spacing: 0.02em;
         }
 
         .btn-small:hover {
-            background: #3d6a4a;
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 0 0 var(--btn-3d-shadow);
+        }
+
+        .btn-small:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 0 0 var(--btn-3d-shadow);
+        }
+
+        .btn-back {
+            padding: 6px 16px;
+            background: #f0ece2;
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-back:hover {
+            background: #e4ddd0;
+            color: var(--text);
+            transform: translateY(-1px);
         }
 
         .btn-small.secondary {
-            background: #f0f0f0;
+            background: #f0ece2;
             color: var(--text);
+            box-shadow: 0 2px 4px 0 rgba(61, 52, 40, 0.06);
         }
 
         .btn-small.secondary:hover {
-            background: #e0e0e0;
+            background: #e4ddd0;
+            box-shadow: 0 3px 10px 0 rgba(61, 52, 40, 0.10);
         }
 
         .btn-small.danger {
             background: var(--danger-light);
             color: var(--danger);
+            box-shadow: none;
         }
 
         .btn-small.danger:hover {
-            background: #f8d7d0;
+            background: #fbd5d2;
         }
 
         /* 打卡清单（家长端） */
@@ -930,6 +976,55 @@
         .checkin-row .task-time {
             font-size: 11px;
             color: var(--text-muted);
+        }
+
+        /* 拖拽排序 */
+        .drag-handle {
+            cursor: grab;
+            padding: 4px 8px;
+            color: var(--text-muted);
+            font-size: 16px;
+            user-select: none;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        .drag-handle:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            background: var(--primary-light);
+        }
+
+        .sortable-chosen {
+            background: var(--accent-light);
+        }
+
+        .btn-save-sort {
+            margin-left: 10px;
+            padding: 6px 14px;
+            font-size: 13px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .btn-save-sort.show {
+            display: inline-block;
+        }
+
+        .btn-save-sort:hover {
+            background: #3d6b4a;
         }
 
         /* 作业提交 */
@@ -1164,11 +1259,396 @@
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
+            .sidebar.mobile-open { display: block; }
             .main-content { margin-left: 0; }
             .kpi-row { grid-template-columns: repeat(2, 1fr); }
             .overview-grid { grid-template-columns: 1fr; }
             .overview-grid .col-span-2 { grid-column: span 1; }
             .page-content { padding: 16px; }
+            
+            /* 手机端汉堡菜单按钮 */
+            .mobile-menu-btn {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 8px;
+                margin-right: 12px;
+                color: var(--text);
+            }
+            
+            /* 手机端打卡清单优化 */
+            .checkin-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .checkin-row .task-name {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+            .quality-stars {
+                flex: 0 0 auto;
+                margin-left: 0;
+                width: 100%;
+                margin-top: 4px;
+            }
+            .btn-submit-photo {
+                flex: 0 0 auto;
+            }
+        }
+        
+        /* 汉堡按钮默认隐藏（桌面端） */
+        .mobile-menu-btn {
+            display: none;
+        }
+
+        /* ========== 错题本样式 ========== */
+        .mistake-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .mistake-stat-card {
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            text-align: center;
+        }
+        .mistake-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .mistake-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .mistake-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .mistake-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            transition: all 0.2s;
+        }
+        .mistake-item:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+        .mistake-item.corrected {
+            opacity: 0.6;
+            border-left: 3px solid var(--primary);
+        }
+        .mistake-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .mistake-subject-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .mistake-status-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .mistake-status-tag.uncorrected {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+        .mistake-status-tag.corrected {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .mistake-topic {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        .mistake-description {
+            font-size: 13px;
+            color: var(--text);
+            margin-bottom: 8px;
+            padding: 8px;
+            background: var(--bg);
+            border-radius: 6px;
+        }
+        .mistake-reason {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .mistake-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .mistake-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mistake-btn.correct {
+            background: var(--primary);
+            color: white;
+        }
+        .mistake-btn.correct:hover {
+            background: #3d6a4a;
+        }
+        .mistake-btn.uncorrect {
+            background: var(--bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .mistake-btn.uncorrect:hover {
+            background: var(--border);
+        }
+
+        /* ========== 试卷分析页样式 ========== */
+        .exam-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .exam-filters select {
+            padding: 8px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+        .exam-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .exam-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .exam-item:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+        .exam-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .exam-item-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .exam-item-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .exam-item-meta .tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .tag-subject { background: var(--primary-light); color: var(--primary); }
+        .tag-type { background: var(--accent-light); color: var(--accent); }
+        .exam-accuracy {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .accuracy-high { color: var(--primary); }
+        .accuracy-mid { color: var(--accent); }
+        .accuracy-low { color: var(--danger); }
+
+        /* 试卷详情弹窗 */
+        .exam-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .exam-modal-overlay.active { display: flex; }
+        .exam-modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        .exam-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .exam-modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        .exam-question-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .exam-question-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #fafafa;
+            font-size: 13px;
+        }
+        .exam-question-item.correct { border-left: 3px solid var(--primary); }
+        .exam-question-item.wrong { border-left: 3px solid var(--danger); }
+        .exam-q-num {
+            font-weight: 600;
+            min-width: 24px;
+            color: var(--text-secondary);
+        }
+        .exam-q-content { flex: 1; }
+        .exam-q-answer { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .exam-q-error { font-size: 12px; color: var(--danger); margin-top: 2px; }
+        .exam-summary-box {
+            background: var(--info-light);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--info);
+        }
+
+        /* 上传试卷弹窗 */
+        .upload-exam-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .upload-exam-modal-overlay.active { display: flex; }
+        .upload-exam-modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 480px;
+            padding: 24px;
+        }
+        .upload-exam-modal h3 {
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        .upload-exam-form .form-group {
+            margin-bottom: 14px;
+        }
+        .upload-exam-form label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .upload-exam-form select,
+        .upload-exam-form input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .upload-exam-form input[type="file"] {
+            padding: 8px;
+        }
+        .btn-upload-exam {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .btn-upload-exam:hover { background: #3d6a4a; }
+        .btn-upload-exam:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* 趋势图 */
+        .trend-chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .trend-subject-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .trend-subject-label {
+            font-weight: 600;
+            min-width: 40px;
+        }
+        .trend-bars {
+            flex: 1;
+            display: flex;
+            gap: 4px;
+            align-items: flex-end;
+            height: 60px;
+        }
+        .trend-bar {
+            flex: 1;
+            min-width: 20px;
+            max-width: 40px;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .trend-bar:hover { opacity: 0.8; }
+        .trend-bar-label {
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--text-muted);
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -1222,8 +1702,11 @@
                 <div class="nav-item nav-subitem" data-page="settings" onclick="switchPage('settings')">
                     <span class="nav-icon">⚙️</span> 任务配置
                 </div>
-                <div class="nav-item" data-page="mistakes" onclick="switchPage('mistakes')">
+                <div class="nav-item" data-page="mistakes" style="display:none" onclick="switchPage('mistakes')">
                     <span class="nav-icon">📝</span> 错题本
+                </div>
+                <div class="nav-item" data-page="exams" onclick="switchPage('exams')">
+                    <span class="nav-icon">📄</span> 试卷分析
                 </div>
                 <div class="nav-item" data-page="points" onclick="switchPage('points')">
                     <span class="nav-icon">🏆</span> 积分管理
@@ -1258,6 +1741,7 @@
         <!-- 主内容 -->
         <main class="main-content">
             <div class="topbar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
                 <div class="topbar-title">
                     <h1 id="pageTitle">概览</h1>
                     <div class="breadcrumb" id="pageBreadcrumb">首页 / 概览</div>
@@ -1286,13 +1770,6 @@
                             </div>
                             <div class="kpi-value" id="kpiStreak">0天</div>
                             <div class="kpi-label">连续打卡</div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-header">
-                                <div class="kpi-icon blue">📝</div>
-                            </div>
-                            <div class="kpi-value" id="kpiMistakes">0</div>
-                            <div class="kpi-label">本周错题</div>
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-header">
@@ -1343,19 +1820,8 @@
                             </div>
                         </div>
 
-                        <!-- 右栏：错题 + 留言 -->
+                        <!-- 右栏：留言 -->
                         <div style="display:flex;flex-direction:column;gap:20px;">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>📝 错题分布</h3>
-                                    <a class="card-action" onclick="switchPage('mistakes')">全部 →</a>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mistake-chart" id="mistakeChart">
-                                        <!-- 动态填充 -->
-                                    </div>
-                                </div>
-                            </div>
                             <div class="card">
                                 <div class="card-header">
                                     <h3>💬 家长留言</h3>
@@ -1380,6 +1846,7 @@
                 <div class="page" id="page-checkins">
                     <div class="card">
                         <div class="card-header">
+                            <button class="btn-back" onclick="switchPage('overview')">← 返回</button>
                             <h3>📅 每日打卡清单</h3>
                             <div style="display:flex;align-items:center;gap:10px;">
                                 <input type="date" id="checkinDate" value="" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;" onchange="loadCheckinDate()">
@@ -1396,10 +1863,12 @@
                 <div class="page" id="page-settings">
                     <div class="card">
                         <div class="card-header">
+                            <button class="btn-back" onclick="switchPage('checkins')">← 返回</button>
                             <h3>⚙️ 任务配置</h3>
                             <div style="display:flex;align-items:center;gap:10px;">
                                 <input type="date" id="taskConfigDate" value="" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;" onchange="loadTaskConfig()">
                                 <button class="btn-small" onclick="showAddTaskModal()">+ 新增任务</button>
+                                <button class="btn-small secondary" onclick="showHistoryTaskModal()">+ 添加任务</button>
                             </div>
                         </div>
                         <div class="card-body no-padding">
@@ -1409,7 +1878,92 @@
                         </div>
                     </div>
                 </div>
-                <div class="page" id="page-mistakes"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📝</div><p>错题本 — 开发中</p></div></div></div></div>
+                <!-- 错题本页 -->
+                <div class="page" id="page-mistakes" style="display:none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>📝 错题本</h3>
+                            <button class="btn btn-primary btn-sm" onclick="showAddMistakeModal()">添加错题</button>
+                        </div>
+                        <div class="card-body">
+                            <!-- 统计卡片 -->
+                            <div class="mistake-stats" id="mistakeStats"></div>
+                            
+                            <!-- 筛选区 -->
+                            <div class="exam-filters">
+                                <select id="mistakeSubjectFilter" onchange="loadMistakeList()">
+                                    <option value="">全部科目</option>
+                                    <option value="语文">语文</option>
+                                    <option value="数学">数学</option>
+                                    <option value="英语">英语</option>
+                                    <option value="其他">其他</option>
+                                </select>
+                                <select id="mistakeStatusFilter" onchange="loadMistakeList()">
+                                    <option value="">全部状态</option>
+                                    <option value="0">未订正</option>
+                                    <option value="1">已订正</option>
+                                </select>
+                            </div>
+                            
+                            <!-- 错题列表 -->
+                            <div id="mistakeListContainer">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📝</div>
+                                    <p>暂无错题记录</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 试卷分析页 -->
+                <div class="page" id="page-exams">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>📄 试卷分析</h3>
+                            <button class="btn btn-primary btn-sm" onclick="showUploadExamModal()">上传试卷</button>
+                        </div>
+                        <div class="card-body">
+                            <!-- 筛选区 -->
+                            <div class="exam-filters">
+                                <select id="examSubjectFilter" onchange="loadExamList()">
+                                    <option value="">全部科目</option>
+                                    <option value="语文">语文</option>
+                                    <option value="数学">数学</option>
+                                    <option value="英语">英语</option>
+                                </select>
+                                <select id="examTypeFilter" onchange="loadExamList()">
+                                    <option value="">全部类型</option>
+                                    <option value="考试">考试</option>
+                                    <option value="练习册">练习册</option>
+                                </select>
+                            </div>
+                            
+                            <!-- 试卷列表 -->
+                            <div id="examListContainer">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📄</div>
+                                    <p>暂无试卷记录</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 趋势分析卡片 -->
+                    <div class="card" style="margin-top: 20px;">
+                        <div class="card-header">
+                            <h3>📈 趋势分析</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="examTrendContainer">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📊</div>
+                                    <p>上传试卷后查看趋势</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- 积分管理页 -->
                 <div class="page" id="page-points">
@@ -1424,6 +1978,17 @@
                         <div class="card-body">
                             <div id="weeklyBonusResult" style="display:none;margin-bottom:16px;"></div>
                             <h4 style="margin-bottom:12px;font-size:14px;color:var(--text-secondary);">积分流水</h4>
+                            
+                            <!-- 自定义积分修改 -->
+                            <div style="background:var(--bg);border-radius:12px;padding:16px;margin-bottom:20px;">
+                                <h4 style="margin-bottom:12px;font-size:14px;color:var(--text);">📝 自定义积分修改</h4>
+                                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                                    <input type="number" id="customPointsInput" placeholder="积分（正数加分，负数减分）" style="flex:1;min-width:150px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
+                                    <input type="text" id="customPointsReason" placeholder="原因说明" style="flex:2;min-width:200px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
+                                    <button class="btn-small" onclick="submitCustomPoints()" style="background:var(--accent);">提交</button>
+                                </div>
+                                <div id="customPointsResult" style="display:none;margin-top:10px;font-size:13px;"></div>
+                            </div>
                             <div id="pointsLedger">
                                 <div class="empty-state"><div class="empty-icon">📋</div><p>加载中...</p></div>
                             </div>
@@ -1435,6 +2000,7 @@
                 <div class="page" id="page-rewards">
                     <div class="card">
                         <div class="card-header">
+                            <button class="btn-back" onclick="switchPage('points')">← 返回</button>
                             <h3>🎁 奖励配置</h3>
                             <button class="btn-small" onclick="showAddRewardModal()">+ 新增奖励</button>
                         </div>
@@ -1450,10 +2016,7 @@
                 <div class="page" id="page-books"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📚</div><p>阅读书单 — 开发中</p></div></div></div></div>
                 <div class="page" id="page-calendar"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><p>学习日历 — 开发中</p></div></div></div></div>
                 <div class="page" id="page-messages"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">💬</div><p>家长留言 — 开发中</p></div></div></div></div>
-            </div>
-        </main>
-    </div>
-
+                
     <!-- 任务编辑模态框 -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal-box">
@@ -1555,9 +2118,27 @@
             </div>
         </div>
     </div>
+    <!-- 历史任务选择模态框 -->
+    <div class="modal-overlay" id="historyTaskModal">
+        <div class="modal-box">
+            <h3>选择历史任务</h3>
+            <div id="historyTaskList" style="max-height:400px;overflow-y:auto;margin:16px 0;"></div>
+            <div class="modal-actions">
+                <button class="btn-small secondary" onclick="closeHistoryTaskModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         const API_BASE = '/xuexi/api';
+        // 获取本地日期（解决 toISOString() 时区问题）
+        function getLocalDate(d = new Date()) {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
         let token = localStorage.getItem('xuexi_token');
         let currentUser = JSON.parse(localStorage.getItem('xuexi_user') || 'null');
         let studentId = null;
@@ -1623,41 +2204,60 @@
             books: ['阅读书单', '首页 / 阅读书单'],
             calendar: ['学习日历', '首页 / 学习日历'],
             messages: ['家长留言', '首页 / 家长留言'],
-            settings: ['任务配置', '首页 / 任务配置']
+            settings: ['任务配置', '首页 / 任务配置'],
+            exams: ['试卷分析', '首页 / 试卷分析']
         };
 
         function switchPage(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`page-${page}`).classList.add('active');
-            document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
-
+            document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
+            
             // 子菜单激活时，父级也高亮（任务配置 → 每日打卡）
             if (page === 'settings') {
-                document.querySelector(`.nav-item[data-page="checkins"]`).classList.add('active');
+                document.querySelector(`.nav-item[data-page="checkins"]`)?.classList.add('active');
             }
-
+            
             const [title, breadcrumb] = pageTitles[page] || [page, page];
             document.getElementById('pageTitle').textContent = title;
             document.getElementById('pageBreadcrumb').textContent = breadcrumb;
-
+            
             // 加载对应页面数据
             if (page === 'checkins') loadCheckinPage();
             if (page === 'settings') loadTaskConfigPage();
             if (page === 'points') loadPointsPage();
             if (page === 'rewards') loadRewardsPage();
+            if (page === 'exams') loadExamPage();
+            if (page === 'mistakes') loadMistakesPage();
+            
+            // 手机端切换页面后关闭菜单
+            if (window.innerWidth <= 768) {
+                closeMobileMenu();
+            }
+        }
+        
+        // 手机端菜单控制
+        function toggleMobileMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('mobile-open');
+        }
+        
+        function closeMobileMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.remove('mobile-open');
         }
 
         // ============ 每日打卡管理（家长端） ============
 
         function loadTaskConfigPage() {
-            const today = new Date().toISOString().split('T')[0];
+            const today = getLocalDate();
             document.getElementById('taskConfigDate').value = today;
             loadTaskConfig();
         }
 
         function loadCheckinPage() {
-            const today = new Date().toISOString().split('T')[0];
+            const today = getLocalDate();
             document.getElementById('checkinDate').value = today;
             loadCheckinDate();
         }
@@ -1684,6 +2284,20 @@
 
         function renderCheckinList(data, submissions) {
             const container = document.getElementById('checkinListContainer');
+
+            // 初始化 qualityScores 从已保存的数据
+            data.tasks.forEach(task => {
+                if (task.quality !== null && task.quality !== undefined) {
+                    qualityScores[task.id] = task.quality;
+                }
+                if (task.sub_tasks) {
+                    task.sub_tasks.forEach(sub => {
+                        if (sub.quality !== null && sub.quality !== undefined) {
+                            qualityScores[sub.id] = sub.quality;
+                        }
+                    });
+                }
+            });
 
             // 按任务 id 索引当天提交记录
             const subMap = {};
@@ -1729,14 +2343,16 @@
             document.getElementById('checkinRate').textContent = `完成率 ${rate}% (${completed}/${total})`;
 
             let html = '';
+            html += '<div id="sortableCheckinList">';
             data.tasks.forEach(task => {
                 if (task.sub_tasks && task.sub_tasks.length > 0) {
                     // 分组任务
                     const subCompleted = task.sub_tasks.filter(s => s.is_completed).length;
                     const subTotal = task.sub_tasks.length;
                     html += `
-                        <div class="checkin-group">
+                        <div class="checkin-group" data-task-id="${task.id}">
                             <div class="checkin-group-header">
+                                <span class="drag-handle">⋮⋮</span>
                                 <span>${task.icon}</span>
                                 <span>${task.name}</span>
                                 <span class="group-count">${subCompleted}/${subTotal}</span>
@@ -1759,9 +2375,10 @@
                 } else {
                     // 普通任务
                     html += `
-                        <div class="checkin-group">
+                        <div class="checkin-group" data-task-id="${task.id}">
                             <div class="checkin-group-body" style="border:1px solid #f0f0f0;border-radius:8px;">
                                 <div class="checkin-row ${task.is_completed ? 'completed' : ''}" onclick="toggleParentCheckin(${task.id}, ${task.is_completed ? 0 : 1})">
+                                    <span class="drag-handle">⋮⋮</span>
                                     <div class="check-box">${task.is_completed ? '✓' : ''}</div>
                                     <span class="task-icon">${task.icon}</span>
                                     <span class="task-name">${task.name}</span>
@@ -1774,14 +2391,88 @@
                     `;
                 }
             });
+            html += '</div>';
 
-            // 底部保存评分按钮
+            // 底部保存评分和排序按钮
             html += `<div style="text-align:center;margin-top:16px;">
                 <button class="btn-small" onclick="saveAllQualityScores()" style="background:var(--accent);padding:10px 28px;font-size:14px;">💾 保存今日评分</button>
                 <span id="qualitySaveMsg" style="margin-left:10px;font-size:13px;color:var(--primary);"></span>
             </div>`;
 
             container.innerHTML = html || '<div class="empty-state"><div class="empty-icon">📋</div><p>当天无打卡任务</p></div>';
+
+            // 初始化拖拽排序
+            initSortable();
+        }
+
+        // 初始化 SortableJS
+        function initSortable() {
+            const sortableEl = document.getElementById('sortableCheckinList');
+            if (!sortableEl) return;
+
+            Sortable.create(sortableEl, {
+                animation: 150,
+                handle: '.drag-handle',
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                onEnd: function(evt) {
+                    // 拖拽结束后显示保存按钮
+                    showSaveSortButton();
+                }
+            });
+        }
+
+        // 显示保存排序按钮
+        function showSaveSortButton() {
+            let btn = document.getElementById('btnSaveSort');
+            if (!btn) {
+                const container = document.getElementById('checkinListContainer');
+                const div = document.createElement('div');
+                div.style.textAlign = 'center';
+                div.style.marginTop = '10px';
+                div.innerHTML = `<button id="btnSaveSort" class="btn-save-sort show" onclick="saveTaskSort()">💾 保存排序</button><span id="sortSaveMsg" style="margin-left:10px;font-size:13px;color:var(--primary);"></span>`;
+                container.appendChild(div);
+            } else {
+                btn.classList.add('show');
+            }
+        }
+
+        // 保存任务排序
+        async function saveTaskSort() {
+            const items = document.querySelectorAll('#sortableCheckinList .checkin-group');
+            const sortOrders = [];
+            items.forEach((item, index) => {
+                const taskId = item.getAttribute('data-task-id');
+                if (taskId) {
+                    sortOrders.push({ task_id: parseInt(taskId), sort_order: index + 1 });
+                }
+            });
+
+            try {
+                const res = await fetch(`${API_BASE}/tasks/batch-sort`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ sort_orders: sortOrders })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const msg = document.getElementById('sortSaveMsg');
+                    if (msg) {
+                        msg.textContent = '✓ 排序已保存';
+                        setTimeout(() => { msg.textContent = ''; }, 2000);
+                    }
+                    const btn = document.getElementById('btnSaveSort');
+                    if (btn) btn.classList.remove('show');
+                } else {
+                    alert('保存排序失败: ' + (data.error || '未知错误'));
+                }
+            } catch (e) {
+                console.error('保存排序失败', e);
+                alert('保存排序失败，请重试');
+            }
         }
 
         async function toggleParentCheckin(taskId, completed) {
@@ -1834,6 +2525,7 @@
                             <div class="task-actions">
                                 <button class="btn-small secondary" onclick="showEditTaskModal(${sub.id})">编辑</button>
                                 <button class="btn-small danger" onclick="removeSchedule(${sub.id})">移除</button>
+                                <button class="btn-small danger" onclick="deleteTask(${sub.id}, '${sub.name.replace(/'/g, "\\'")}')">删除</button>
                             </div>
                         </div>
                     `).join('');
@@ -1848,6 +2540,7 @@
                                 <button class="btn-small secondary" onclick="showEditTaskModal(${task.id})">编辑</button>
                                 <button class="btn-small secondary" onclick="showAddTaskModal(${task.id})">+子任务</button>
                                 ${task.has_schedule ? `<button class="btn-small danger" onclick="removeSchedule(${task.id})">移除</button>` : ''}
+                                <button class="btn-small danger" onclick="deleteTask(${task.id}, '${task.name.replace(/'/g, "\\'")}')">删除</button>
                             </div>
                         </div>
                         ${subHtml}
@@ -1872,6 +2565,27 @@
                 loadTaskConfig();
             } catch (e) {
                 alert('移除失败');
+                console.error(e);
+            }
+        }
+
+        // 删除任务模板（永久删除，所有日期的排期都会删除）
+        async function deleteTask(taskId, taskName) {
+            if (!confirm(`确定删除任务「${taskName}」吗？\n\n⚠️ 这将永久删除该任务，所有日期的排期都会清除！`)) return;
+            try {
+                const res = await fetch(`${API_BASE}/tasks/${taskId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('删除成功');
+                    loadTaskConfig();
+                } else {
+                    alert('删除失败');
+                }
+            } catch (e) {
+                alert('删除失败');
                 console.error(e);
             }
         }
@@ -2089,7 +2803,6 @@
                 const data = await res.json();
                 document.getElementById('kpiRate').textContent = data.today_rate + '%';
                 document.getElementById('kpiStreak').textContent = data.streak + '天';
-                document.getElementById('kpiMistakes').textContent = data.week_mistakes;
                 document.getElementById('kpiMessages').textContent = data.unread_messages;
                 document.getElementById('kpiTrend').textContent = data.today_rate >= 80 ? '↑ 优秀' : data.today_rate >= 50 ? '→ 加油' : '↓ 需努力';
             } catch (e) { console.error(e); }
@@ -2129,28 +2842,6 @@
                 `).join('');
             } catch (e) { console.error(e); }
 
-            // 错题分布
-            try {
-                const res = await fetch(`${API_BASE}/mistakes/stats?student_id=${studentId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const container = document.getElementById('mistakeChart');
-                if (data.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><p>暂无错题记录</p></div>';
-                } else {
-                    const maxCount = Math.max(...data.map(d => d.total));
-                    const barColors = ['#c0392b', '#e67e22', '#3498db', '#27ae60'];
-                    container.innerHTML = data.map((s, i) => `
-                        <div class="mistake-row">
-                            <span class="subject">${s.subject}</span>
-                            <div class="bar-wrap">
-                                <div class="bar-fill" style="width:${(s.total/maxCount)*100}%;background:${barColors[i%4]}">${s.total}</div>
-                            </div>
-                            <span class="count">${s.total}道</span>
-                        </div>
-                    `).join('');
-                }
-            } catch (e) { console.error(e); }
-
             // 留言
             loadMessages();
             
@@ -2159,7 +2850,7 @@
         }
 
         async function toggleCheckin(taskId, completed) {
-            const today = new Date().toISOString().split('T')[0];
+            const today = getLocalDate();
             try {
                 await fetch(`${API_BASE}/checkins`, {
                     method: 'POST',
@@ -2541,6 +3232,672 @@
                 alert('删除失败');
             }
         }
+
+        // ============ 试卷分析功能 ============
+
+        async function loadExamPage() {
+            await loadExamList();
+            await loadExamTrend();
+        }
+
+        async function loadExamList() {
+            const subject = document.getElementById('examSubjectFilter').value;
+            const examType = document.getElementById('examTypeFilter').value;
+            
+            let url = `${API_BASE}/exams?student_id=${studentId}`;
+            if (subject) url += `&subject=${subject}`;
+            if (examType) url += `&exam_type=${examType}`;
+
+            try {
+                const res = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const exams = await res.json();
+                renderExamList(exams);
+            } catch (e) {
+                console.error('加载试卷列表失败', e);
+            }
+        }
+
+        function renderExamList(exams) {
+            const container = document.getElementById('examListContainer');
+            
+            if (exams.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📄</div>
+                        <p>暂无试卷记录</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = exams.map(exam => {
+                const accuracy = exam.accuracy ? Math.round(exam.accuracy * 100) : 0;
+                const accuracyClass = accuracy >= 90 ? 'accuracy-high' : accuracy >= 70 ? 'accuracy-mid' : 'accuracy-low';
+                
+                return `
+                    <div class="exam-item" onclick="showExamDetail(${exam.id})">
+                        <div class="exam-item-header">
+                            <div>
+                                <div class="exam-item-title">${exam.title}</div>
+                                <div class="exam-item-meta">
+                                    <span class="tag tag-subject">${exam.subject}</span>
+                                    <span class="tag tag-type">${exam.exam_type}</span>
+                                    <span>${exam.exam_date}</span>
+                                    <span>${exam.total_questions}题 · 对${exam.correct_count}题</span>
+                                </div>
+                            </div>
+                            <div class="exam-accuracy ${accuracyClass}">${accuracy}%</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `<div class="exam-list">${html}</div>`;
+        }
+
+        async function showExamDetail(examId) {
+            try {
+                const res = await fetch(`${API_BASE}/exams/${examId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const exam = await res.json();
+                renderExamDetail(exam);
+            } catch (e) {
+                console.error('加载试卷详情失败', e);
+            }
+        }
+
+        function renderExamDetail(exam) {
+            const accuracy = exam.accuracy ? Math.round(exam.accuracy * 100) : 0;
+            const accuracyClass = accuracy >= 90 ? 'accuracy-high' : accuracy >= 70 ? 'accuracy-mid' : 'accuracy-low';
+
+            const questionsHtml = exam.questions.map(q => {
+                const statusClass = q.is_correct ? 'correct' : 'wrong';
+                const statusIcon = q.is_correct ? '✓' : '✗';
+                const errorInfo = !q.is_correct ? `
+                    <div class="exam-q-error">
+                        ${q.error_type ? `错误类型：${q.error_type}` : ''}
+                        ${q.knowledge_point ? ` · 知识点：${q.knowledge_point}` : ''}
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="exam-question-item ${statusClass}">
+                        <div class="exam-q-num">${statusIcon} ${q.question_num}</div>
+                        <div class="exam-q-content">
+                            <div>${q.question_content}</div>
+                            <div class="exam-q-answer">
+                                学生答案：${q.student_answer || '未作答'} 
+                                ${!q.is_correct ? `· 正确答案：${q.correct_answer}` : ''}
+                            </div>
+                            ${errorInfo}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const modalHtml = `
+                <div class="exam-modal-overlay active" onclick="closeExamDetail(event)">
+                    <div class="exam-modal" onclick="event.stopPropagation()">
+                        <div class="exam-modal-header">
+                            <div>
+                                <h3>${exam.title}</h3>
+                                <div class="exam-item-meta" style="margin-top: 8px;">
+                                    <span class="tag tag-subject">${exam.subject}</span>
+                                    <span class="tag tag-type">${exam.exam_type}</span>
+                                    <span>${exam.exam_date}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="exam-accuracy ${accuracyClass}" style="font-size: 24px;">${accuracy}%</div>
+                                <button class="exam-modal-close" onclick="closeExamDetail()">&times;</button>
+                            </div>
+                        </div>
+                        <div class="exam-question-list">
+                            ${questionsHtml}
+                        </div>
+                        ${exam.summary ? `<div class="exam-summary-box"><strong>AI分析：</strong>${exam.summary}</div>` : ''}
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function closeExamDetail(event) {
+            if (event && event.target && !event.target.classList.contains('exam-modal-overlay')) return;
+            const overlay = document.querySelector('.exam-modal-overlay.active');
+            if (overlay) overlay.remove();
+        }
+
+        function showUploadExamModal() {
+            const modalHtml = `
+                <div class="upload-exam-modal-overlay active" id="uploadExamModal" onclick="closeUploadExamModal(event)">
+                    <div class="upload-exam-modal" onclick="event.stopPropagation()">
+                        <h3>上传试卷</h3>
+                        <form class="upload-exam-form" onsubmit="handleUploadExam(event)">
+                            <div class="form-group">
+                                <label>科目</label>
+                                <select id="uploadExamSubject" required>
+                                    <option value="">请选择科目</option>
+                                    <option value="语文">语文</option>
+                                    <option value="数学">数学</option>
+                                    <option value="英语">英语</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>类型</label>
+                                <select id="uploadExamType" required>
+                                    <option value="">请选择类型</option>
+                                    <option value="考试">考试</option>
+                                    <option value="练习册">练习册</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>考试日期</label>
+                                <input type="date" id="uploadExamDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>试卷标题（可选）</label>
+                                <input type="text" id="uploadExamTitle" placeholder="如：第三单元测试">
+                            </div>
+                            <div class="form-group">
+                                <label>上传照片</label>
+                                <input type="file" id="uploadExamImage" accept="image/*" required>
+                            </div>
+                            <button type="submit" class="btn-upload-exam" id="uploadExamBtn">上传并分析</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            document.getElementById('uploadExamDate').valueAsDate = new Date();
+        }
+
+        function closeUploadExamModal(event) {
+            if (event && event.target && !event.target.classList.contains('upload-exam-modal-overlay')) return;
+            const modal = document.getElementById('uploadExamModal');
+            if (modal) modal.remove();
+        }
+
+        async function handleUploadExam(event) {
+            event.preventDefault();
+            
+            const subject = document.getElementById('uploadExamSubject').value;
+            const examType = document.getElementById('uploadExamType').value;
+            const examDate = document.getElementById('uploadExamDate').value;
+            const title = document.getElementById('uploadExamTitle').value;
+            const imageFile = document.getElementById('uploadExamImage').files[0];
+
+            if (!subject || !examType || !examDate || !imageFile) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            const btn = document.getElementById('uploadExamBtn');
+            btn.disabled = true;
+            btn.textContent = '正在上传和分析...';
+
+            const formData = new FormData();
+            formData.append('student_id', studentId);
+            formData.append('subject', subject);
+            formData.append('exam_type', examType);
+            formData.append('exam_date', examDate);
+            formData.append('title', title);
+            formData.append('image', imageFile);
+
+            try {
+                const res = await fetch(`${API_BASE}/exams`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+
+                if (res.ok) {
+                    closeUploadExamModal();
+                    await loadExamPage();
+                    alert('试卷分析完成！');
+                } else {
+                    const err = await res.json();
+                    alert(`上传失败：${err.error || '未知错误'}`);
+                }
+            } catch (e) {
+                console.error('上传试卷失败', e);
+                alert('上传失败');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '上传并分析';
+            }
+        }
+
+        async function loadExamTrend() {
+            const subjects = ['语文', '数学', '英语'];
+            const trendData = {};
+
+            for (const subject of subjects) {
+                try {
+                    const res = await fetch(`${API_BASE}/exams/trend/${subject}?student_id=${studentId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await res.json();
+                    if (data.length > 0) {
+                        trendData[subject] = data;
+                    }
+                } catch (e) {
+                    console.error(`加载${subject}趋势失败`, e);
+                }
+            }
+
+            renderExamTrend(trendData);
+        }
+
+        function renderExamTrend(trendData) {
+            const container = document.getElementById('examTrendContainer');
+            const subjects = Object.keys(trendData);
+
+            if (subjects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📊</div>
+                        <p>上传试卷后查看趋势</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = subjects.map(subject => {
+                const data = trendData[subject];
+                const maxAccuracy = Math.max(...data.map(d => d.accuracy || 0));
+                
+                const barsHtml = data.map(d => {
+                    const accuracy = d.accuracy || 0;
+                    const height = maxAccuracy > 0 ? (accuracy / maxAccuracy * 100) : 0;
+                    const color = accuracy >= 0.9 ? 'var(--primary)' : accuracy >= 0.7 ? 'var(--accent)' : 'var(--danger)';
+                    const date = d.exam_date.slice(5); // MM-DD
+                    
+                    return `
+                        <div class="trend-bar" style="height: ${height}%; background: ${color};" title="${d.exam_date}: ${Math.round(accuracy * 100)}%">
+                            <div class="trend-bar-label">${date}</div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="trend-subject-row">
+                        <div class="trend-subject-label">${subject}</div>
+                        <div class="trend-bars">${barsHtml}</div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `<div class="trend-chart-container">${html}</div>`;
+        }
+
+        // ============ 错题本功能 ============
+        
+        async function loadMistakesPage() {
+            await loadMistakeStats();
+            await loadMistakeList();
+        }
+
+        async function loadMistakeStats() {
+            try {
+                const res = await fetch(`${API_BASE}/mistakes/stats?student_id=${studentId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const stats = await res.json();
+                renderMistakeStats(stats);
+            } catch (e) {
+                console.error('加载错题统计失败', e);
+            }
+        }
+
+        function renderMistakeStats(stats) {
+            const container = document.getElementById('mistakeStats');
+            if (!stats || stats.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const total = stats.reduce((sum, s) => sum + s.total, 0);
+            const corrected = stats.reduce((sum, s) => sum + s.corrected, 0);
+            const uncorrected = total - corrected;
+
+            const html = `
+                <div class="mistake-stat-card">
+                    <div class="mistake-stat-value">${total}</div>
+                    <div class="mistake-stat-label">总错题数</div>
+                </div>
+                <div class="mistake-stat-card">
+                    <div class="mistake-stat-value" style="color: var(--danger);">${uncorrected}</div>
+                    <div class="mistake-stat-label">未订正</div>
+                </div>
+                <div class="mistake-stat-card">
+                    <div class="mistake-stat-value" style="color: var(--primary);">${corrected}</div>
+                    <div class="mistake-stat-label">已订正</div>
+                </div>
+                <div class="mistake-stat-card">
+                    <div class="mistake-stat-value">${total > 0 ? Math.round(corrected / total * 100) : 0}%</div>
+                    <div class="mistake-stat-label">订正率</div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        async function loadMistakeList() {
+            const subject = document.getElementById('mistakeSubjectFilter').value;
+            const status = document.getElementById('mistakeStatusFilter').value;
+
+            let url = `${API_BASE}/mistakes?student_id=${studentId}`;
+            if (subject) url += `&subject=${subject}`;
+            if (status !== '') url += `&is_corrected=${status}`;
+
+            try {
+                const res = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const mistakes = await res.json();
+                renderMistakeList(mistakes);
+            } catch (e) {
+                console.error('加载错题列表失败', e);
+            }
+        }
+
+        function renderMistakeList(mistakes) {
+            const container = document.getElementById('mistakeListContainer');
+            
+            if (!mistakes || mistakes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <p>暂无错题记录</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = mistakes.map(m => {
+                const statusClass = m.is_corrected ? 'corrected' : 'uncorrected';
+                const statusText = m.is_corrected ? '已订正' : '未订正';
+                const itemClass = m.is_corrected ? 'corrected' : '';
+                
+                return `
+                    <div class="mistake-item ${itemClass}">
+                        <div class="mistake-item-header">
+                            <span class="mistake-subject-tag">${m.subject}</span>
+                            <span class="mistake-status-tag ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="mistake-topic">${m.topic || '未分类'}</div>
+                        <div class="mistake-description">${m.description}</div>
+                        ${m.error_reason ? `<div class="mistake-reason">错误原因：${m.error_reason}</div>` : ''}
+                        <div class="mistake-reason">创建时间：${new Date(m.created_at).toLocaleString('zh-CN')}</div>
+                        <div class="mistake-actions">
+                            ${m.is_corrected 
+                                ? `<button class="mistake-btn uncorrect" onclick="toggleMistakeStatus(${m.id}, false)">标记为未订正</button>`
+                                : `<button class="mistake-btn correct" onclick="toggleMistakeStatus(${m.id}, true)">标记为已订正</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `<div class="mistake-list">${html}</div>`;
+        }
+
+        async function toggleMistakeStatus(id, isCorrected) {
+            try {
+                const res = await fetch(`${API_BASE}/mistakes/${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ is_corrected: isCorrected ? 1 : 0 })
+                });
+
+                if (res.ok) {
+                    await loadMistakesPage();
+                } else {
+                    alert('更新失败');
+                }
+            } catch (e) {
+                console.error('更新错题状态失败', e);
+                alert('更新失败');
+            }
+        }
+
+        function showAddMistakeModal() {
+            const modalHtml = `
+                <div class="upload-exam-modal-overlay active" id="addMistakeModal" onclick="closeAddMistakeModal(event)">
+                    <div class="upload-exam-modal" onclick="event.stopPropagation()">
+                        <h3>添加错题</h3>
+                        <form class="upload-exam-form" onsubmit="handleAddMistake(event)">
+                            <div class="form-group">
+                                <label>科目</label>
+                                <select id="mistakeSubject" required>
+                                    <option value="">请选择科目</option>
+                                    <option value="语文">语文</option>
+                                    <option value="数学">数学</option>
+                                    <option value="英语">英语</option>
+                                    <option value="其他">其他</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>题目分类</label>
+                                <input type="text" id="mistakeTopic" placeholder="如：分数加减法、一般过去时" required>
+                            </div>
+                            <div class="form-group">
+                                <label>题目内容</label>
+                                <textarea id="mistakeDescription" rows="3" placeholder="输入题目内容" required style="width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit;"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>错误原因（可选）</label>
+                                <textarea id="mistakeErrorReason" rows="2" placeholder="分析错误原因" style="width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit;"></textarea>
+                            </div>
+                            <button type="submit" class="btn-upload-exam" id="addMistakeBtn">添加错题</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function closeAddMistakeModal(event) {
+            if (event && event.target && !event.target.classList.contains('upload-exam-modal-overlay')) return;
+            const modal = document.getElementById('addMistakeModal');
+            if (modal) modal.remove();
+        }
+
+        async function handleAddMistake(event) {
+            event.preventDefault();
+            
+            const subject = document.getElementById('mistakeSubject').value;
+            const topic = document.getElementById('mistakeTopic').value;
+            const description = document.getElementById('mistakeDescription').value;
+            const errorReason = document.getElementById('mistakeErrorReason').value;
+
+            if (!subject || !topic || !description) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            const btn = document.getElementById('addMistakeBtn');
+            btn.disabled = true;
+            btn.textContent = '添加中...';
+
+            const formData = new FormData();
+            formData.append('student_id', studentId);
+            formData.append('subject', subject);
+            formData.append('topic', topic);
+            formData.append('description', description);
+            formData.append('error_reason', errorReason);
+
+            try {
+                const res = await fetch(`${API_BASE}/mistakes`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+
+                if (res.ok) {
+                    closeAddMistakeModal();
+                    await loadMistakesPage();
+                    alert('添加成功！');
+                } else {
+                    const err = await res.json();
+                    alert(`添加失败：${err.error || '未知错误'}`);
+                }
+            } catch (e) {
+                console.error('添加错题失败', e);
+                alert('添加失败');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '添加错题';
+            }
+        }
+
     </script>
+
+<script>
+async function submitCustomPoints() {
+    const pointsInput = document.getElementById('customPointsInput');
+    const reasonInput = document.getElementById('customPointsReason');
+    const resultDiv = document.getElementById('customPointsResult');
+    
+    const points = parseInt(pointsInput.value);
+    const reason = reasonInput.value.trim();
+    
+    if (isNaN(points) || points === 0) {
+        resultDiv.style.display = 'block';
+        resultDiv.style.color = 'var(--danger)';
+        resultDiv.textContent = '请输入有效的积分数量（不能为0）';
+        return;
+    }
+    
+    if (!reason) {
+        resultDiv.style.display = 'block';
+        resultDiv.style.color = 'var(--danger)';
+        resultDiv.textContent = '请输入原因说明';
+        return;
+    }
+    
+    try {
+        const res = await fetch('/xuexi/api/points/custom', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('xuexi_token')
+            },
+            body: JSON.stringify({
+                student_id: 2, // 小石榴的ID
+                points: points,
+                reason: reason
+            })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+            resultDiv.style.display = 'block';
+            resultDiv.style.color = 'var(--success)';
+            resultDiv.textContent = '✓ 积分修改成功！';
+            pointsInput.value = '';
+            reasonInput.value = '';
+            loadPointsPage(); // 刷新积分页面
+        } else {
+            resultDiv.style.display = 'block';
+            resultDiv.style.color = 'var(--danger)';
+            resultDiv.textContent = '✗ ' + (data.error || '修改失败');
+        }
+    } catch (e) {
+        resultDiv.style.display = 'block';
+        resultDiv.style.color = 'var(--danger)';
+        resultDiv.textContent = '✗ 提交失败：' + e.message;
+    }
+}
+</script>
+<script>
+
+// 显示历史任务选择弹窗
+async function showHistoryTaskModal() {
+    const date = document.getElementById('taskConfigDate').value;
+    if (!date) {
+        alert('请先选择日期');
+        return;
+    }
+    
+    try {
+        const res = await fetch('/xuexi/api/tasks/history', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const tasks = await res.json();
+        
+        let html = '<div style="max-height:400px;overflow-y:auto;">';
+        tasks.forEach(task => {
+            const safeName = task.name.replace(/'/g, "\\'");
+            const subCount = (task.sub_tasks && task.sub_tasks.length > 0) ? '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">包含 ' + task.sub_tasks.length + ' 个子任务</div>' : '';
+            html += '<div style="padding:12px;border-bottom:1px solid var(--border);cursor:pointer;" onclick="addHistoryTask(' + task.id + ', \'' + safeName + '\')">';
+            html += '<div style="font-weight:600;">' + task.icon + ' ' + task.name + '</div>';
+            html += subCount;
+            html += '</div>';
+        });
+        html += '</div>';
+        html += '</div>';
+        
+        document.getElementById('historyTaskList').innerHTML = html;
+        document.getElementById('historyTaskModal').classList.add('active');
+    } catch (e) {
+        console.error('加载历史任务失败:', e);
+        alert('加载历史任务失败');
+    }
+}
+
+function closeHistoryTaskModal() {
+    document.getElementById('historyTaskModal').classList.remove('active');
+}
+
+// 添加历史任务到当天打卡清单
+async function addHistoryTask(taskId, taskName) {
+    const date = document.getElementById('taskConfigDate').value;
+    if (!date) {
+        alert('请先选择日期');
+        return;
+    }
+    
+    if (!confirm('确定将"' + taskName + '"添加到' + date + '的打卡清单吗？')) {
+        return;
+    }
+    
+    try {
+        const res = await fetch('/xuexi/api/checkins/add-task', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                student_id: studentId,
+                task_id: taskId,
+                date: date
+            })
+        });
+        
+        const result = await res.json();
+        
+        if (result.success) {
+            alert('✓ 任务已添加到打卡清单');
+            closeHistoryTaskModal();
+            loadTaskConfig();
+        } else {
+            alert('✗ ' + (result.error || '添加失败'));
+        }
+    } catch (e) {
+        console.error('添加任务失败:', e);
+        alert('添加任务失败');
+    }
+}
+</script>
 </body>
 </html>

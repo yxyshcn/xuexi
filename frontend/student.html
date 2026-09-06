@@ -4,39 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>小石榴的学习</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --bg: #f5f5f0;
-            --card: #ffffff;
-            --border: #e8e4dc;
-            --text: #2d2d2d;
-            --text-secondary: #6b6b6b;
-            --text-muted: #999999;
-            --primary: #4a7c59;
-            --primary-light: #e8f0eb;
-            --accent: #d4a574;
-            --accent-light: #faf3eb;
-            --danger: #c0392b;
-            --danger-light: #fceae8;
-            --info: #5b8fa8;
-            --info-light: #e8f2f7;
-            --purple: #7c6da0;
-            --purple-light: #f0edf5;
-            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --radius: 14px;
-            --radius-sm: 10px;
+            /* 动森色板 - Animal Crossing Palette */
+            --bg: #f8f8f0;
+            --card: rgb(247, 243, 223);
+            --border: #e8e2d6;
+            --text: #725d42;
+            --text-secondary: #8a7b66;
+            --text-muted: #9f927d;
+            --primary: #19c8b9;
+            --primary-hover: #3dd4c6;
+            --primary-active: #50b9ab;
+            --primary-light: #e6f9f6;
+            --accent: #f7cd67;
+            --accent-light: #fdf6e3;
+            --danger: #fc736d;
+            --danger-light: #fde8e7;
+            --info: #889df0;
+            --info-light: #e8ecfc;
+            --purple: #b77dee;
+            --purple-light: #f3eafc;
+            --shadow: 0 2px 4px 0 rgba(61, 52, 40, 0.06);
+            --shadow-md: 0 3px 10px 0 rgba(61, 52, 40, 0.10);
+            --radius: 20px;
+            --radius-sm: 16px;
+            --btn-3d-shadow: #bdaea0;
+            --focus-yellow: #ffcc00;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            font-family: Nunito, 'Noto Sans SC', 'Zen Maru Gothic', 'HarmonyOS Sans SC', -apple-system, 'PingFang SC', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             padding-bottom: 88px;
             -webkit-font-smoothing: antialiased;
+            font-weight: 500;
+            letter-spacing: 0.01em;
         }
 
         /* ========== 登录页 ========== */
@@ -47,7 +57,7 @@
             justify-content: center;
             min-height: 100vh;
             padding: 24px;
-            background: linear-gradient(160deg, #e8f0eb 0%, #faf3eb 50%, #f5f0e8 100%);
+            background: linear-gradient(160deg, #e6f9f6 0%, #fdf6e3 50%, #f8f8f0 100%);
         }
 
         .login-mascot {
@@ -62,18 +72,19 @@
         }
 
         .login-card {
-            background: white;
-            border-radius: 20px;
+            background: rgb(247, 243, 223);
+            border-radius: 24px;
             padding: 36px 28px;
             width: 100%;
             max-width: 340px;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 8px 24px rgba(114, 93, 66, 0.15);
+            border: 2px solid var(--border);
             text-align: center;
         }
 
         .login-card h1 {
             font-size: 22px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text);
             margin-bottom: 4px;
         }
@@ -92,26 +103,27 @@
         .login-card label {
             display: block;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-secondary);
             margin-bottom: 6px;
         }
 
         .login-card input {
             width: 100%;
-            padding: 12px 16px;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 50px;
             font-size: 15px;
-            background: #fafafa;
-            transition: all 0.2s;
+            font-weight: 500;
+            background: #fffbe7;
+            color: var(--text);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .login-card input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+            outline: 2px solid var(--focus-yellow);
+            outline-offset: 2px;
+            background: #fff;
         }
 
         .btn-login {
@@ -120,16 +132,25 @@
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 50px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 8px;
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 0 0 var(--btn-3d-shadow);
+            letter-spacing: 0.02em;
+        }
+
+        .btn-login:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 0 0 var(--btn-3d-shadow);
         }
 
         .btn-login:active {
-            transform: scale(0.98);
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 0 var(--btn-3d-shadow);
         }
 
         .login-error {
@@ -146,8 +167,8 @@
         /* 顶部问候 */
         .header {
             padding: 24px 20px 16px;
-            background: white;
-            border-bottom: 1px solid var(--border);
+            background: rgb(247, 243, 223);
+            border-bottom: 2px solid var(--border);
         }
 
         .header-top {
@@ -164,19 +185,160 @@
         }
 
         .header-avatar {
-            width: 40px;
-            height: 40px;
-            background: var(--primary-light);
+            width: 60px;
+            height: 60px;
+            background: var(--accent);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 18px;
+            cursor: pointer;
+            overflow: hidden;
+            border: 2px solid var(--border);
+            transition: transform 0.2s;
+        }
+
+        .header-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .header-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 头像库页面 */
+        .avatar-gallery {
+            padding: 16px 20px;
+        }
+
+        .avatar-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .avatar-tab {
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #f0ece2;
+            color: var(--text-secondary);
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .avatar-tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 3px 0 0 var(--btn-3d-shadow);
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .avatar-item {
+            background: rgb(247, 243, 223);
+            border-radius: 16px;
+            border: 2px solid var(--border);
+            padding: 12px;
+            text-align: center;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .avatar-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .avatar-item .avatar-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 8px;
+            overflow: hidden;
+            border: 2px solid var(--border);
+            background: #f0ece2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .avatar-item .avatar-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-item .avatar-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .avatar-item .avatar-price {
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .avatar-item .avatar-btn {
+            margin-top: 6px;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .avatar-btn.buy {
+            background: var(--accent);
+            color: #725d42;
+            box-shadow: 0 2px 0 0 var(--btn-3d-shadow);
+        }
+
+        .avatar-btn.use {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 0 0 var(--btn-3d-shadow);
+        }
+
+        .avatar-btn.using {
+            background: var(--primary-light);
+            color: var(--primary);
+            cursor: default;
+            box-shadow: none;
+        }
+
+        .avatar-btn.locked {
+            background: #f0ece2;
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .avatar-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 14px;
         }
 
         .date-display {
             font-size: 14px;
             color: var(--text-muted);
+            font-weight: 500;
         }
 
         /* KPI 卡片 */
@@ -188,20 +350,25 @@
         }
 
         .kpi-card {
-            background: white;
-            border-radius: var(--radius);
+            background: rgb(247, 243, 223);
+            border-radius: 20px;
             padding: 16px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             display: flex;
             align-items: center;
             gap: 12px;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
         }
 
         .kpi-icon {
             width: 44px;
             height: 44px;
-            border-radius: 12px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -216,7 +383,7 @@
 
         .kpi-info .kpi-value {
             font-size: 22px;
-            font-weight: 700;
+            font-weight: 800;
             color: var(--text);
             line-height: 1.2;
         }
@@ -224,6 +391,7 @@
         .kpi-info .kpi-label {
             font-size: 12px;
             color: var(--text-muted);
+            font-weight: 500;
         }
 
         /* 区域标题 */
@@ -241,7 +409,7 @@
 
         .section-title {
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text);
         }
 
@@ -249,6 +417,7 @@
             font-size: 13px;
             color: var(--primary);
             cursor: pointer;
+            font-weight: 600;
         }
 
         /* 任务卡片 */
@@ -262,13 +431,18 @@
             display: flex;
             align-items: center;
             padding: 14px 16px;
-            background: white;
-            border-radius: var(--radius-sm);
+            background: rgb(247, 243, 223);
+            border-radius: 16px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             gap: 12px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .task-item:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
         .task-item:active {
@@ -277,26 +451,32 @@
 
         .task-item.completed {
             background: var(--primary-light);
-            border-color: #b8d4c0;
+            border-color: var(--primary-active);
         }
 
         .task-checkbox {
             width: 26px;
             height: 26px;
-            border: 2.5px solid #d0d0d0;
+            border: 2.5px solid #c4b89e;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
             color: white;
-            transition: all 0.2s;
+            transition: all 0.15s;
             flex-shrink: 0;
+            background: var(--card);
+        }
+
+        .task-checkbox:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
         }
 
         .task-item.completed .task-checkbox {
             background: var(--primary);
-            border-color: var(--primary);
+            border-color: var(--primary-active);
         }
 
         .task-icon {
@@ -317,9 +497,9 @@
 
         .task-status {
             font-size: 12px;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-weight: 600;
         }
 
         .task-status.done {
@@ -328,7 +508,7 @@
         }
 
         .task-status.pending {
-            background: #f5f5f5;
+            background: #f0ece2;
             color: var(--text-muted);
         }
 
@@ -346,12 +526,17 @@
             flex-direction: column;
             align-items: center;
             padding: 14px 8px;
-            background: white;
-            border-radius: var(--radius-sm);
+            background: rgb(247, 243, 223);
+            border-radius: 16px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .action-btn:active {
@@ -361,7 +546,7 @@
         .action-btn .action-icon {
             width: 36px;
             height: 36px;
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -377,22 +562,22 @@
         .action-btn .action-text {
             font-size: 12px;
             color: var(--text-secondary);
-            font-weight: 500;
+            font-weight: 600;
         }
 
         /* 留言卡片 */
         .message-card {
             margin: 0 20px 16px;
-            background: linear-gradient(135deg, var(--accent-light), #fff);
-            border-radius: var(--radius);
+            background: linear-gradient(135deg, var(--accent-light), rgb(247, 243, 223));
+            border-radius: 20px;
             padding: 16px;
-            border: 1px solid #f0e0d0;
+            border: 2px solid #f0e0c0;
         }
 
         .message-card .msg-from {
             font-size: 12px;
             color: var(--accent);
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
@@ -403,6 +588,7 @@
             font-size: 15px;
             color: var(--text);
             line-height: 1.6;
+            font-weight: 500;
         }
 
         .message-card .msg-time {
@@ -417,12 +603,12 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: white;
+            background: rgb(247, 243, 223);
             display: flex;
             justify-content: space-around;
             padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-            border-top: 1px solid var(--border);
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+            border-top: 2px solid var(--border);
+            box-shadow: 0 -2px 8px rgba(114, 93, 66, 0.08);
             z-index: 100;
         }
 
@@ -443,12 +629,12 @@
         .nav-item .nav-label {
             font-size: 11px;
             color: var(--text-muted);
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .nav-item.active .nav-label {
             color: var(--primary);
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .nav-item.active::after {
@@ -539,22 +725,31 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 8px 18px;
+            border-radius: 50px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 3px 0 0 var(--btn-3d-shadow);
             white-space: nowrap;
         }
 
         .reward-btn:hover {
-            background: #3d6a4a;
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 0 0 var(--btn-3d-shadow);
+        }
+
+        .reward-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 0 0 var(--btn-3d-shadow);
         }
 
         .reward-btn:disabled {
-            background: #ccc;
+            background: #d4c9b4;
             cursor: not-allowed;
+            box-shadow: none;
         }
 
         .redemption-item {
@@ -601,11 +796,11 @@
         }
 
         .form-card {
-            background: white;
-            border-radius: var(--radius);
+            background: rgb(247, 243, 223);
+            border-radius: 20px;
             padding: 20px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             margin-bottom: 16px;
         }
 
@@ -629,26 +824,29 @@
         .form-card input,
         .form-card textarea {
             width: 100%;
-            padding: 12px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 50px;
             font-size: 15px;
-            background: #fafafa;
-            transition: all 0.2s;
+            font-weight: 500;
+            background: #fffbe7;
+            color: var(--text);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .form-card textarea {
             height: 80px;
             resize: none;
             font-family: inherit;
+            border-radius: 16px;
         }
 
         .form-card select:focus,
         .form-card input:focus,
         .form-card textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
+            outline: 2px solid var(--focus-yellow);
+            outline-offset: 2px;
+            background: #fff;
         }
 
         .btn-submit {
@@ -657,25 +855,39 @@
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 50px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 0 0 var(--btn-3d-shadow);
+            letter-spacing: 0.02em;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 0 0 var(--btn-3d-shadow);
         }
 
         .btn-submit:active {
-            transform: scale(0.98);
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 0 var(--btn-3d-shadow);
         }
 
         /* 进度页 */
         .progress-card {
-            background: white;
-            border-radius: var(--radius);
+            background: rgb(247, 243, 223);
+            border-radius: 20px;
             padding: 16px;
             margin: 0 20px 12px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-card:hover {
+            transform: translateY(-2px);
         }
 
         .progress-card .subject-row {
@@ -691,7 +903,7 @@
 
         .progress-card .subject-name {
             font-size: 15px;
-            font-weight: 600;
+            font-weight: 700;
             flex: 1;
         }
 
@@ -703,7 +915,7 @@
 
         .progress-bar {
             height: 8px;
-            background: #f0f0f0;
+            background: #f0ece2;
             border-radius: 4px;
             overflow: hidden;
         }
@@ -711,7 +923,7 @@
         .progress-bar .fill {
             height: 100%;
             border-radius: 4px;
-            background: linear-gradient(90deg, var(--primary), #6ba37a);
+            background: linear-gradient(90deg, var(--primary), var(--primary-active));
             transition: width 0.5s ease;
         }
 
@@ -721,6 +933,7 @@
             margin-top: 8px;
             font-size: 12px;
             color: var(--text-muted);
+            font-weight: 500;
         }
 
         /* 阅读页 */
@@ -728,12 +941,17 @@
             display: flex;
             align-items: center;
             padding: 14px 16px;
-            background: white;
-            border-radius: var(--radius-sm);
+            background: rgb(247, 243, 223);
+            border-radius: 16px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             margin: 0 20px 8px;
             gap: 12px;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .book-item:hover {
+            transform: translateY(-2px);
         }
 
         .book-item .book-icon {
@@ -746,29 +964,30 @@
 
         .book-item .book-title {
             font-size: 15px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .book-item .book-pages {
             font-size: 12px;
             color: var(--text-muted);
+            font-weight: 500;
         }
 
         .book-item .book-status {
             font-size: 11px;
-            padding: 3px 8px;
-            border-radius: 12px;
+            padding: 3px 10px;
+            border-radius: 50px;
             background: var(--primary-light);
             color: var(--primary);
-            font-weight: 500;
+            font-weight: 600;
         }
 
         /* 任务分组 */
         .task-group {
-            background: white;
-            border-radius: var(--radius-sm);
+            background: rgb(247, 243, 223);
+            border-radius: 16px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             overflow: hidden;
             margin-bottom: 8px;
         }
@@ -779,7 +998,7 @@
             padding: 14px 16px;
             background: var(--primary-light);
             gap: 12px;
-            border-bottom: 1px solid #d8e8dc;
+            border-bottom: 2px dashed var(--border);
         }
 
         .task-group-header .task-icon {
@@ -795,11 +1014,11 @@
 
         .task-group-count {
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--primary);
             padding: 3px 10px;
             background: white;
-            border-radius: 12px;
+            border-radius: 50px;
         }
 
         .task-group-body {
@@ -812,7 +1031,7 @@
         .task-group-body .task-item {
             margin: 0;
             box-shadow: none;
-            border: 1px solid #f0f0f0;
+            border: 1px dashed var(--border);
             padding: 12px 14px;
         }
 
@@ -966,7 +1185,10 @@
             <div class="header">
                 <div class="header-top">
                     <div class="greeting" id="greeting">你好，小石榴！</div>
-                    <div class="header-avatar">🌸</div>
+                    <div class="header-avatar" onclick="switchPage('avatar')">
+                        <img id="currentAvatar" src="" alt="头像" style="display:none;">
+                        <span id="defaultAvatarIcon">🌸</span>
+                    </div>
                 </div>
                 <div class="date-display" id="dateDisplay"></div>
             </div>
@@ -993,13 +1215,7 @@
                         <div class="kpi-label">本周打卡</div>
                     </div>
                 </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon purple">📝</div>
-                    <div class="kpi-info">
-                        <div class="kpi-value" id="kpiMistakes">0</div>
-                        <div class="kpi-label">本周错题</div>
-                    </div>
-                </div>
+
             </div>
 
             <div class="section">
@@ -1036,7 +1252,6 @@
                     <div class="form-group">
                         <label>类型</label>
                         <select id="submitType">
-                            <option value="mistake">📝 错题</option>
                             <option value="homework">📄 作业</option>
                         </select>
                     </div>
@@ -1110,13 +1325,7 @@
                         <div class="kpi-label">本周打卡</div>
                     </div>
                 </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon blue">📝</div>
-                    <div class="kpi-info">
-                        <div class="kpi-value" id="totalMistakes">0</div>
-                        <div class="kpi-label">本周错题</div>
-                    </div>
-                </div>
+
             </div>
 
             <div class="section">
@@ -1125,6 +1334,27 @@
                 </div>
             </div>
             <div id="subjectProgress"></div>
+        </div>
+
+        <!-- 头像库页面 -->
+        <div class="page" id="page-avatar">
+            <div class="header">
+                <div class="header-top">
+                    <div class="greeting">🎨 我的头像</div>
+                    <div class="header-avatar" onclick="switchPage('today')">
+                        <img id="currentAvatar2" src="" alt="头像" style="display:none;">
+                        <span id="defaultAvatarIcon2">🌸</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="avatar-gallery">
+                <div class="avatar-tabs">
+                    <button class="avatar-tab active" onclick="switchAvatarTab('all')">全部</button>
+                    <button class="avatar-tab" onclick="switchAvatarTab('owned')">我的</button>
+                </div>
+                <div class="avatar-grid" id="avatarGrid"></div>
+            </div>
         </div>
 
         <!-- 积分兑换页 -->
@@ -1167,6 +1397,10 @@
                 <span class="nav-icon">📸</span>
                 <span class="nav-label">提交</span>
             </div>
+            <div class="nav-item" data-page="avatar" onclick="switchPage('avatar')">
+                <span class="nav-icon">🎨</span>
+                <span class="nav-label">头像</span>
+            </div>
             <div class="nav-item" data-page="points" onclick="switchPage('points')">
                 <span class="nav-icon">🏆</span>
                 <span class="nav-label">积分</span>
@@ -1174,10 +1408,6 @@
             <div class="nav-item" data-page="progress" onclick="switchPage('progress')">
                 <span class="nav-icon">📊</span>
                 <span class="nav-label">进度</span>
-            </div>
-            <div class="nav-item" onclick="doLogout()">
-                <span class="nav-icon">🚪</span>
-                <span class="nav-label">退出</span>
             </div>
         </div>
     </div>
@@ -1245,6 +1475,7 @@
             const now = new Date();
             document.getElementById('dateDisplay').textContent = now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
             loadTodayTasks();
+            loadCurrentAvatar();
             loadMessages();
         }
 
@@ -1306,6 +1537,7 @@
                 }
                 showSubmitResult(data);
                 loadTodayTasks(); // 刷新今日任务显示已提交状态
+            loadCurrentAvatar();
             } catch (e) {
                 alert('提交失败：网络错误，请检查网络后重试');
                 console.error(e);
@@ -1354,10 +1586,12 @@
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`page-${page}`).classList.add('active');
-            document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
+            const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
+            if (navItem) navItem.classList.add('active');
             if (page === 'progress') loadProgress();
             if (page === 'reading') loadBooks();
             if (page === 'points') loadPointsPage();
+            if (page === 'avatar') loadAvatarGallery();
         }
 
         async function loadTodayTasks() {
@@ -1452,7 +1686,6 @@
                 const res = await fetch(`${API_BASE}/stats/dashboard`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await res.json();
                 document.getElementById('kpiStreak').textContent = data.streak + '天';
-                document.getElementById('kpiMistakes').textContent = data.week_mistakes;
             } catch (e) { console.error(e); }
 
             try {
@@ -1472,6 +1705,7 @@
                     body: JSON.stringify({ task_id: taskId, date: today, is_completed: completed })
                 });
                 loadTodayTasks();
+            loadCurrentAvatar();
             } catch (e) { console.error(e); }
         }
 
@@ -1500,7 +1734,7 @@
             const formData = new FormData();
             formData.append('subject', subject);
             formData.append('description', content);
-            formData.append('topic', type === 'mistake' ? '错题' : '作业');
+            formData.append('topic', '作业');
             if (imageFile) formData.append('image', imageFile);
             try {
                 await fetch(`${API_BASE}/mistakes`, {
@@ -1559,12 +1793,6 @@
                 const data = await res.json();
                 const total = data.stats.reduce((sum, d) => sum + d.completed, 0);
                 document.getElementById('totalCheckins').textContent = total;
-            } catch (e) { console.error(e); }
-            try {
-                const res = await fetch(`${API_BASE}/mistakes/stats`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const total = data.reduce((sum, s) => sum + s.total, 0);
-                document.getElementById('totalMistakes').textContent = total;
             } catch (e) { console.error(e); }
             try {
                 const res = await fetch(`${API_BASE}/stats/subjects`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -1683,9 +1911,178 @@
                 }
             } catch (e) {
                 console.error(e);
-                alert('兑换失败：网络错误');
+                alert('兑换失败，请稍后重试');
             }
         }
+
+        // ============ 头像功能 ============
+        let allAvatars = [];
+        let ownedAvatars = [];
+        let currentAvatarId = null;
+        let avatarTab = 'all';
+
+        async function loadDashboard() {
+            try {
+                const res = await fetch(`${API_BASE}/stats/dashboard`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                
+                document.getElementById('kpiStreak').textContent = data.streak + '天';
+                document.getElementById('kpiWeekCheckins').textContent = data.week_checkins;
+                document.getElementById('kpiPoints').textContent = data.points;
+                
+                // 加载当前头像
+                loadCurrentAvatar();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadCurrentAvatar() {
+            try {
+                const res = await fetch(`${API_BASE}/students/avatar`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const avatar = await res.json();
+                
+                if (avatar && avatar.image_url) {
+                    document.getElementById("currentAvatar").src = avatar.image_url;
+                    const ca2 = document.getElementById("currentAvatar2");
+                    if (ca2) { ca2.src = avatar.image_url; ca2.style.display = "block"; }
+                    document.getElementById('currentAvatar').style.display = 'block';
+                    document.getElementById('defaultAvatarIcon').style.display = 'none';
+const dai2 = document.getElementById('defaultAvatarIcon2');                    if (dai2) { dai2.style.display = 'none'; }
+                    currentAvatarId = avatar.id;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+async function loadAvatarGallery() {
+            try {
+                // 先确保加载了当前头像
+                await loadCurrentAvatar();
+                // 加载所有头像和已拥有的头像
+                const [allRes, ownedRes] = await Promise.all([
+                    fetch(`${API_BASE}/avatars`),
+                    fetch(`${API_BASE}/avatars/mine`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
+                allAvatars = await allRes.json();
+                ownedAvatars = await ownedRes.json();
+                renderAvatarGrid();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function switchAvatarTab(tab) {
+            avatarTab = tab;
+            document.querySelectorAll('.avatar-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderAvatarGrid();
+        }
+
+        function renderAvatarGrid() {
+            const grid = document.getElementById('avatarGrid');
+            const avatars = avatarTab === 'owned' ? ownedAvatars : allAvatars;
+            
+            if (avatars.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">暂无头像</div>';
+                return;
+            }
+            
+            grid.innerHTML = avatars.map(avatar => {
+                const isOwned = ownedAvatars.some(a => a.id === avatar.id);
+                const isUsing = currentAvatarId === avatar.id;
+                
+                let btnHtml = '';
+                if (isUsing) {
+                    btnHtml = '<button class="avatar-btn using" disabled>使用中</button>';
+                } else if (isOwned) {
+                    btnHtml = `<button class="avatar-btn use" onclick="useAvatar(${avatar.id})">使用</button>`;
+                } else {
+                    btnHtml = `<button class="avatar-btn buy" onclick="buyAvatar(${avatar.id}, ${avatar.price})">购买 ${avatar.price}分</button>`;
+                }
+                
+                const badge = isUsing ? '<div class="avatar-badge">⭐</div>' : '';
+                
+                return `
+                    <div class="avatar-item">
+                        ${badge}
+                        <div class="avatar-img">
+                            <img src="${avatar.image_url}" alt="${avatar.name}">
+                        </div>
+                        <div class="avatar-name">${avatar.name}</div>
+                        ${btnHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function buyAvatar(avatarId, price) {
+            const points = parseInt(document.getElementById('kpiPoints').textContent);
+            if (points < price) {
+                alert(`积分不足！需要 ${price} 分，当前只有 ${points} 分`);
+                return;
+            }
+            
+            if (!confirm(`确定要购买这个头像吗？\n价格：${price} 积分`)) return;
+            
+            try {
+                const res = await fetch(`${API_BASE}/avatars/${avatarId}/purchase`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert('🎉 购买成功！');
+                    document.getElementById('kpiPoints').textContent = data.new_balance;
+                    loadAvatarGallery();
+                } else {
+                    alert(data.error || '购买失败');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('购买失败，请稍后重试');
+            }
+        }
+
+        async function useAvatar(avatarId) {
+            try {
+                const res = await fetch(`${API_BASE}/students/avatar`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ avatar_id: avatarId })
+                });
+                
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert('✅ 头像已更换！');
+                    currentAvatarId = avatarId;
+                    loadCurrentAvatar();
+                    renderAvatarGrid();
+                } else {
+                    alert(data.error || '更换失败');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('更换失败，请稍后重试');
+            }
+        }
+
+        // 初始化加载
+        loadDashboard();
     </script>
 </body>
 </html>

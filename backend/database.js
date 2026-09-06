@@ -24,6 +24,10 @@ const defaultData = {
   points_ledger: [],
   rewards: [],
   redemptions: [],
+  exams: [],
+  exam_questions: [],
+  avatars: [],
+  student_avatars: [],
   _meta: {
     nextId: {
       users: 1,
@@ -37,7 +41,11 @@ const defaultData = {
       submissions: 1,
       points_ledger: 1,
       rewards: 1,
-      redemptions: 1
+      redemptions: 1,
+      exams: 1,
+      exam_questions: 1,
+      avatars: 1,
+      student_avatars: 1
     }
   }
 };
@@ -66,12 +74,24 @@ function ensureDefaults(d) {
   if (!Array.isArray(d.points_ledger)) { d.points_ledger = []; changed = true; }
   if (!Array.isArray(d.rewards)) { d.rewards = []; changed = true; }
   if (!Array.isArray(d.redemptions)) { d.redemptions = []; changed = true; }
+  if (!Array.isArray(d.exams)) { d.exams = []; changed = true; }
+  if (!Array.isArray(d.exam_questions)) { d.exam_questions = []; changed = true; }
+  if (!Array.isArray(d.avatars)) { d.avatars = []; changed = true; }
+  if (!Array.isArray(d.student_avatars)) { d.student_avatars = []; changed = true; }
   if (!d._meta) { d._meta = { nextId: {} }; changed = true; }
   if (!d._meta.nextId) { d._meta.nextId = {}; changed = true; }
   if (!d._meta.nextId.submissions) { d._meta.nextId.submissions = 1; changed = true; }
   if (!d._meta.nextId.points_ledger) { d._meta.nextId.points_ledger = 1; changed = true; }
   if (!d._meta.nextId.rewards) { d._meta.nextId.rewards = 1; changed = true; }
   if (!d._meta.nextId.redemptions) { d._meta.nextId.redemptions = 1; changed = true; }
+  if (!d._meta.nextId.exams) { d._meta.nextId.exams = 1; changed = true; }
+  if (!d._meta.nextId.exam_questions) { d._meta.nextId.exam_questions = 1; changed = true; }
+  if (!d._meta.nextId.avatars) { d._meta.nextId.avatars = 1; changed = true; }
+  if (!d._meta.nextId.student_avatars) { d._meta.nextId.student_avatars = 1; changed = true; }
+  // 确保 users 有 avatar_id 字段
+  d.users.forEach(u => {
+    if (u.avatar_id === undefined) { u.avatar_id = null; changed = true; }
+  });
   // 确保 checkins 有 quality 字段
   d.checkins.forEach(c => {
     if (c.quality === undefined) { c.quality = null; changed = true; }
@@ -230,6 +250,13 @@ const db = {
       return true;
     }
     return false;
+  },
+  deleteMistake: (id) => {
+    const d = loadData();
+    const before = d.mistakes.length;
+    d.mistakes = d.mistakes.filter(m => m.id !== id);
+    if (d.mistakes.length < before) saveData();
+    return d.mistakes.length < before;
   },
   getMistakesStats: (studentId) => {
     const mistakes = loadData().mistakes.filter(m => m.student_id === studentId);
@@ -440,6 +467,92 @@ const db = {
       .sort((a, b) => b.redeemed_at.localeCompare(a.redeemed_at));
   },
 
+  // ============ 试卷分析 ============
+  createExam: (exam) => {
+    const d = loadData();
+    const newExam = { id: getNextId('exams'), ...exam, created_at: new Date().toISOString() };
+    d.exams.push(newExam);
+    saveData();
+    return newExam;
+  },
+  getExams: (studentId, filters = {}) => {
+    let results = loadData().exams.filter(e => e.student_id === studentId);
+    if (filters.subject) results = results.filter(e => e.subject === filters.subject);
+    if (filters.exam_type) results = results.filter(e => e.exam_type === filters.exam_type);
+    return results.sort((a, b) => b.exam_date.localeCompare(a.exam_date));
+  },
+  getExamById: (id) => {
+    return loadData().exams.find(e => e.id === id);
+  },
+  updateExam: (id, updates) => {
+    const d = loadData();
+    const idx = d.exams.findIndex(e => e.id === id);
+    if (idx >= 0) {
+      d.exams[idx] = { ...d.exams[idx], ...updates };
+      saveData();
+      return d.exams[idx];
+    }
+    return null;
+  },
+  deleteExam: (id) => {
+    const d = loadData();
+    d.exams = d.exams.filter(e => e.id !== id);
+    d.exam_questions = d.exam_questions.filter(q => q.exam_id !== id);
+    saveData();
+    return true;
+  },
+  // 题目
+  createExamQuestion: (q) => {
+    const d = loadData();
+    const newQ = { id: getNextId('exam_questions'), ...q };
+    d.exam_questions.push(newQ);
+    saveData();
+    return newQ;
+  },
+  getExamQuestions: (examId) => {
+    return loadData().exam_questions.filter(q => q.exam_id === examId).sort((a, b) => a.question_num - b.question_num);
+  },
+  // 统计：某学生某科目的所有考试趋势
+  getExamTrend: (studentId, subject) => {
+    const exams = loadData().exams.filter(e => e.student_id === studentId && e.subject === subject);
+    return exams.sort((a, b) => a.exam_date.localeCompare(b.exam_date)).map(e => ({
+      id: e.id,
+      exam_date: e.exam_date,
+      exam_type: e.exam_type,
+      title: e.title,
+      accuracy: e.accuracy,
+      total_questions: e.total_questions,
+      correct_count: e.correct_count
+    }));
+  },
+  // 月度报告数据
+  getMonthlyExamStats: (studentId, month) => {
+    const exams = loadData().exams.filter(e => e.student_id === studentId && e.exam_date.startsWith(month));
+    const bySubject = {};
+    exams.forEach(e => {
+      if (!bySubject[e.subject]) bySubject[e.subject] = { subject: e.subject, exams: 0, total_q: 0, correct_q: 0, accuracies: [] };
+      bySubject[e.subject].exams++;
+      bySubject[e.subject].total_q += (e.total_questions || 0);
+      bySubject[e.subject].correct_q += (e.correct_count || 0);
+      if (e.accuracy !== undefined && e.accuracy !== null) bySubject[e.subject].accuracies.push(e.accuracy);
+    });
+    Object.values(bySubject).forEach(s => {
+      s.avg_accuracy = s.accuracies.length ? s.accuracies.reduce((a, b) => a + b, 0) / s.accuracies.length : null;
+    });
+    // 汇总所有错题知识点
+    const allQs = loadData().exam_questions.filter(q => exams.some(e => e.id === q.exam_id));
+    const wrongQs = allQs.filter(q => !q.is_correct);
+    const knowledgePoints = {};
+    wrongQs.forEach(q => {
+      const kp = q.knowledge_point || '未分类';
+      if (!knowledgePoints[kp]) knowledgePoints[kp] = { point: kp, subject: q.subject, count: 0, error_types: {} };
+      knowledgePoints[kp].count++;
+      const et = q.error_type || '未知';
+      knowledgePoints[kp].error_types[et] = (knowledgePoints[kp].error_types[et] || 0) + 1;
+    });
+    return { month, exams: exams.length, by_subject: Object.values(bySubject), weak_points: Object.values(knowledgePoints) };
+  },
+
   // 统计
   getTodayStats: (studentId, today) => {
     const checkins = loadData().checkins.filter(c => c.student_id === studentId && c.date === today);
@@ -458,7 +571,12 @@ const db = {
 
     let streak = 0;
     const today = new Date();
-    for (let i = 0; i < 365; i++) {
+    
+    // 检查今天是否打卡，如果没打卡就从昨天开始算
+    const todayStr = today.toISOString().split('T')[0];
+    const startOffset = checkins.includes(todayStr) ? 0 : 1;
+    
+    for (let i = startOffset; i < 365 + startOffset; i++) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
       const dateStr = d.toISOString().split('T')[0];
@@ -469,6 +587,97 @@ const db = {
       }
     }
     return streak;
+  },
+
+  // ============ 头像管理 ============
+  getAllAvatars: () => {
+    return loadData().avatars.sort((a, b) => a.price - b.price);
+  },
+  getAvatarById: (id) => {
+    return loadData().avatars.find(a => a.id === id);
+  },
+  createAvatar: (avatar) => {
+    const d = loadData();
+    const newAvatar = {
+      id: getNextId('avatars'),
+      ...avatar,
+      created_at: new Date().toISOString()
+    };
+    d.avatars.push(newAvatar);
+    saveData();
+    return newAvatar;
+  },
+  updateAvatar: (id, updates) => {
+    const d = loadData();
+    const idx = d.avatars.findIndex(a => a.id === id);
+    if (idx >= 0) {
+      d.avatars[idx] = { ...d.avatars[idx], ...updates };
+      saveData();
+      return true;
+    }
+    return false;
+  },
+  deleteAvatar: (id) => {
+    const d = loadData();
+    d.avatars = d.avatars.filter(a => a.id !== id);
+    // 同时删除学生已购买记录
+    d.student_avatars = d.student_avatars.filter(sa => sa.avatar_id !== id);
+    // 清除使用该头像的用户
+    d.users.forEach(u => {
+      if (u.avatar_id === id) u.avatar_id = null;
+    });
+    saveData();
+    return true;
+  },
+
+  // 学生已购买头像
+  getStudentAvatars: (studentId) => {
+    const d = loadData();
+    return d.student_avatars
+      .filter(sa => sa.student_id === studentId)
+      .map(sa => {
+        const avatar = d.avatars.find(a => a.id === sa.avatar_id);
+        return avatar ? { ...avatar, purchased_at: sa.purchased_at } : null;
+      })
+      .filter(a => a !== null);
+  },
+  purchaseAvatar: (studentId, avatarId) => {
+    const d = loadData();
+    // 检查是否已购买
+    const existing = d.student_avatars.find(sa => 
+      sa.student_id === studentId && sa.avatar_id === avatarId
+    );
+    if (existing) return { success: false, error: '已购买过该头像' };
+
+    const avatar = d.avatars.find(a => a.id === avatarId);
+    if (!avatar) return { success: false, error: '头像不存在' };
+
+    // 检查积分
+    const balance = db.getPointsBalance(studentId);
+    if (balance < avatar.price) {
+      return { success: false, error: '积分不足' };
+    }
+
+    // 扣除积分
+    db.addPoints({ student_id: studentId, points: -avatar.price, source: "avatar_purchase", description: "购买头像: " + avatar.name, date: new Date().toISOString().split("T")[0] });
+
+    // 添加购买记录
+    d.student_avatars.push({
+      id: getNextId('student_avatars'),
+      student_id: studentId,
+      avatar_id: avatarId,
+      purchased_at: new Date().toISOString()
+    });
+    saveData();
+    return { success: true, new_balance: balance - avatar.price };
+  },
+  setStudentAvatar: (studentId, avatarId) => {
+    const d = loadData();
+    const user = d.users.find(u => u.id === studentId);
+    if (!user) return false;
+    user.avatar_id = avatarId;
+    saveData();
+    return true;
   }
 };
 

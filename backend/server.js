@@ -8,6 +8,14 @@ const fs = require('fs');
 
 const { loadData, saveData, db } = require('./database');
 
+// 辅助函数：获取本地日期（Asia/Shanghai UTC+8）
+function getLocalDate(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 const app = express();
 const PORT = 3003;
 const JWT_SECRET = 'xuexi-xiaoliu-2026-secret';
@@ -127,13 +135,27 @@ async function gradeWithMiniMax(imagePath) {
 // JWT 认证中间件
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  if (!authHeader) return res.status(401).json({ error: '未登录' });
+
+  const token = authHeader.split(' ')[1];
   if (!token) return res.status(401).json({ error: '未登录' });
 
+  // 先尝试 JWT token
   jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: '登录已过期' });
-    req.user = user;
-    next();
+    if (!err) {
+      req.user = user;
+      return next();
+    }
+    
+    // JWT 失败，尝试 API Key
+    const data = loadData();
+    const apiKey = data.api_keys?.find(k => k.key === token && k.is_active === 1);
+    if (apiKey) {
+      req.user = { id: apiKey.student_id, role: 'student', display_name: 'ESP32设备' };
+      return next();
+    }
+    
+    return res.status(403).json({ error: '认证失败' });
   });
 }
 
@@ -250,6 +272,20 @@ app.put('/api/tasks/:id', authenticateToken, requireParent, (req, res) => {
   res.json({ success });
 });
 
+// 批量更新任务排序
+app.post('/api/tasks/batch-sort', authenticateToken, requireParent, (req, res) => {
+  const { sort_orders } = req.body;
+  if (!Array.isArray(sort_orders)) {
+    return res.status(400).json({ error: 'sort_orders must be an array' });
+  }
+  let allSuccess = true;
+  sort_orders.forEach(item => {
+    const ok = db.updateTask(item.task_id, { sort_order: item.sort_order });
+    if (!ok) allSuccess = false;
+  });
+  res.json({ success: allSuccess });
+});
+
 app.delete('/api/tasks/:id', authenticateToken, requireParent, (req, res) => {
   const success = db.deleteTask(parseInt(req.params.id));
   res.json({ success });
@@ -258,7 +294,7 @@ app.delete('/api/tasks/:id', authenticateToken, requireParent, (req, res) => {
 // ============ 打卡 API ============
 
 app.get('/api/checkins/today', authenticateToken, (req, res) => {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDate();
   const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
 
   const tasks = db.getAllTasks();
@@ -273,6 +309,7 @@ app.get('/api/checkins/today', authenticateToken, (req, res) => {
       ...sub,
       is_completed: checkinMap[sub.id]?.is_completed || 0,
       note: checkinMap[sub.id]?.note || null,
+      quality: checkinMap[sub.id]?.quality ?? null,
       has_schedule: checkinMap[sub.id] ? true : false
     }));
     // 子任务只显示当天有安排的
@@ -281,8 +318,13 @@ app.get('/api/checkins/today', authenticateToken, (req, res) => {
       ...task,
       is_completed: checkinMap[task.id]?.is_completed || 0,
       note: checkinMap[task.id]?.note || null,
+      quality: checkinMap[task.id]?.quality ?? null,
+      has_schedule: checkinMap[task.id] ? true : false,
       sub_tasks: visibleSubTasks
     };
+  }).filter(task => {
+    // 只返回当天有排期的任务：自身有排期 或 有子任务排期
+    return task.has_schedule || task.sub_tasks.length > 0;
   });
 
   res.json({ date: today, tasks: result });
@@ -300,8 +342,8 @@ app.get('/api/checkins/week', authenticateToken, (req, res) => {
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
 
-  const startDate = monday.toISOString().split('T')[0];
-  const endDate = sunday.toISOString().split('T')[0];
+  const startDate = getLocalDate(monday);
+  const endDate = getLocalDate(sunday);
 
   const stats = db.getCheckinsGroupedByDate(studentId, startDate, endDate);
 
@@ -335,6 +377,7 @@ app.get('/api/checkins/:date', authenticateToken, (req, res) => {
       ...sub,
       is_completed: checkinMap[sub.id]?.is_completed || 0,
       note: checkinMap[sub.id]?.note || null,
+      quality: checkinMap[sub.id]?.quality ?? null,
       has_schedule: checkinMap[sub.id] ? true : false
     }));
     // 子任务只显示当天有安排的
@@ -343,8 +386,13 @@ app.get('/api/checkins/:date', authenticateToken, (req, res) => {
       ...task,
       is_completed: checkinMap[task.id]?.is_completed || 0,
       note: checkinMap[task.id]?.note || null,
+      quality: checkinMap[task.id]?.quality ?? null,
+      has_schedule: checkinMap[task.id] ? true : false,
       sub_tasks: visibleSubTasks
     };
+  }).filter(task => {
+    // 只返回当天有排期的任务：自身有排期 或 有子任务排期
+    return task.has_schedule || task.sub_tasks.length > 0;
   });
 
   res.json({ date: req.params.date, tasks: result });
@@ -488,6 +536,11 @@ app.patch('/api/mistakes/:id', authenticateToken, (req, res) => {
   res.json({ success: true });
 });
 
+app.delete('/api/mistakes/:id', authenticateToken, (req, res) => {
+  const success = db.deleteMistake(parseInt(req.params.id));
+  res.json({ success });
+});
+
 app.get('/api/mistakes/stats', authenticateToken, (req, res) => {
   const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
   const stats = db.getMistakesStats(studentId);
@@ -566,7 +619,7 @@ app.patch('/api/messages/:id/read', authenticateToken, (req, res) => {
 
 app.get('/api/stats/dashboard', authenticateToken, (req, res) => {
   const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDate();
 
   // 今日完成率
   const todayStats = db.getTodayStats(studentId, today);
@@ -579,7 +632,7 @@ app.get('/api/stats/dashboard', authenticateToken, (req, res) => {
   const dayOfWeek = now.getDay() || 7;
   const monday = new Date(now);
   monday.setDate(now.getDate() - dayOfWeek + 1);
-  const weekStart = monday.toISOString().split('T')[0];
+  const weekStart = getLocalDate(monday);
 
   const weekMistakes = db.getMistakesSince(studentId, weekStart);
 
@@ -632,8 +685,8 @@ app.get('/api/reports/week', authenticateToken, (req, res) => {
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
 
-  const startDate = monday.toISOString().split('T')[0];
-  const endDate = sunday.toISOString().split('T')[0];
+  const startDate = getLocalDate(monday);
+  const endDate = getLocalDate(sunday);
 
   // 本周打卡统计
   const dailyStats = db.getCheckinsGroupedByDate(studentId, startDate, endDate);
@@ -796,8 +849,8 @@ app.get('/api/points/weekly-check', authenticateToken, requireParent, (req, res)
   monday.setDate(now.getDate() - dayOfWeek + 1);
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
-  const weekStart = monday.toISOString().split('T')[0];
-  const weekEnd = sunday.toISOString().split('T')[0];
+  const weekStart = getLocalDate(monday);
+  const weekEnd = getLocalDate(sunday);
 
   // 检查是否已发过本周全勤奖
   const already = db.getWeeklyBonus(studentId, weekStart);
@@ -904,6 +957,289 @@ app.delete('/api/rewards/:id', authenticateToken, requireParent, (req, res) => {
   res.json({ success });
 });
 
+// ============ 试卷分析 API ============
+
+// 试卷AI分析函数（支持语文/数学/英语，考试卷+练习册）
+async function analyzeExamWithMiniMax(imagePath, subject, examType) {
+  const apiKey = process.env.MINIMAX_CN_API_KEY;
+  if (!apiKey) {
+    return { status: 'failed', error: 'MINIMAX_CN_API_KEY 未配置' };
+  }
+  try {
+    const b64 = fs.readFileSync(imagePath).toString('base64');
+    const lower = imagePath.toLowerCase();
+    const mime = lower.endsWith('.png') ? 'image/png'
+      : lower.endsWith('.webp') ? 'image/webp'
+      : lower.endsWith('.gif') ? 'image/gif'
+      : 'image/jpeg';
+
+    const subjectDesc = {
+      '语文': '语文（包括字词、阅读理解、作文等）',
+      '数学': '数学（包括计算题、应用题、几何题等）',
+      '英语': '英语（包括单词、语法、阅读理解等）'
+    }[subject] || subject;
+
+    const typeDesc = examType === '练习册' ? '练习册作业' : '考试试卷';
+
+    const prompt = `你是一位经验丰富的小学${subjectDesc}老师，负责批改学生的${typeDesc}。
+请仔细识别图片中的每一道题目，并判断学生的答案是否正确。
+要求：
+1. 逐题列出：题号、题目内容（简短概括）、学生答案、正确答案、是否正确
+2. 对每道错题，分析错误类型：
+   - "计算错误"：计算过程出错
+   - "概念不清"：对知识点理解有误
+   - "粗心"：审题不清或抄写错误
+   - "不会"：完全不会做，空白或乱写
+3. 对每道题标注涉及的知识点（如"两位数加法"、"分数比较"、"一般过去时"等）
+4. 如果题目或答案模糊看不清，correct 标记为 false，并在 note 里写"看不清"
+5. 严格只输出一个 JSON 对象，不要 markdown 代码块标记，不要任何解释、注释或多余文字。
+
+输出格式：
+{
+  "questions": [
+    {
+      "question_num": 1,
+      "question_content": "题目内容简短概括",
+      "question_type": "选择题/填空题/计算题/应用题/阅读理解/作文",
+      "student_answer": "学生写的答案",
+      "correct_answer": "正确答案",
+      "is_correct": true,
+      "error_type": "",
+      "knowledge_point": "涉及的知识点",
+      "note": ""
+    }
+  ],
+  "total_questions": 10,
+  "correct_count": 8,
+  "accuracy": 0.8,
+  "summary": "整体评价，指出主要薄弱环节"
+}`;
+
+    const callApi = async (promptText) => {
+      const resp = await fetch('https://api.minimaxi.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'MiniMax-M3',
+          thinking: { type: 'disabled' },
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text: promptText },
+              { type: 'image_url', image_url: { url: `data:${mime};base64,${b64}` } }
+            ]
+          }],
+          max_tokens: 6000
+        })
+      });
+      const data = await resp.json();
+      return data?.choices?.[0]?.message?.content || '';
+    };
+
+    let text = await callApi(prompt);
+    let result = extractJsonFromText(text);
+
+    // 解析失败时重试一次
+    if (!result) {
+      console.error('试卷AI首次解析失败，重试。raw:', text.slice(0, 300));
+      const retryPrompt = `识别图片中的${typeDesc}题目并批改。只输出 JSON，格式：{"questions":[{"question_num":1,"question_content":"题目","question_type":"类型","student_answer":"学生答案","correct_answer":"正确答案","is_correct":true,"error_type":"","knowledge_point":"知识点","note":""}],"total_questions":题目数,"correct_count":答对数,"accuracy":正确率,"summary":"评价"}。不要输出 JSON 以外的任何内容。`;
+      text = await callApi(retryPrompt);
+      result = extractJsonFromText(text);
+    }
+
+    if (!result) {
+      return { status: 'failed', error: 'AI 返回格式无法解析', raw: text.slice(0, 500) };
+    }
+    return { status: 'analyzed', ...result };
+  } catch (e) {
+    console.error('试卷AI分析失败', e);
+    return { status: 'failed', error: e.message };
+  }
+}
+
+// 上传并分析试卷
+app.post('/api/exams', authenticateToken, upload.single('image'), async (req, res) => {
+  const { student_id, subject, exam_type, exam_date, title } = req.body;
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(student_id);
+
+  if (!req.file) return res.status(400).json({ error: '请上传试卷照片' });
+  if (!subject || !exam_type || !exam_date) {
+    return res.status(400).json({ error: '缺少科目、类型或日期' });
+  }
+
+  const imagePath = `/uploads/${req.file.filename}`;
+  const fullPath = req.file.path;
+
+  // AI分析
+  const aiResult = await analyzeExamWithMiniMax(fullPath, subject, exam_type);
+
+  // 创建考试记录
+  const exam = db.createExam({
+    student_id: studentId,
+    subject,
+    exam_type, // 考试/练习册
+    exam_date,
+    title: title || `${subject}${exam_type} - ${exam_date}`,
+    total_questions: aiResult.status === 'analyzed' ? aiResult.total_questions : 0,
+    correct_count: aiResult.status === 'analyzed' ? aiResult.correct_count : 0,
+    accuracy: aiResult.status === 'analyzed' ? aiResult.accuracy : null,
+    summary: aiResult.status === 'analyzed' ? aiResult.summary : null,
+    ai_status: aiResult.status
+  });
+
+  // 保存每道题的详情
+  if (aiResult.status === 'analyzed' && Array.isArray(aiResult.questions)) {
+    aiResult.questions.forEach(q => {
+      db.createExamQuestion({
+        exam_id: exam.id,
+        subject,
+        question_num: q.question_num,
+        question_content: q.question_content || '',
+        question_type: q.question_type || '',
+        student_answer: q.student_answer || '',
+        correct_answer: q.correct_answer || '',
+        is_correct: q.is_correct ? 1 : 0,
+        error_type: q.error_type || '',
+        knowledge_point: q.knowledge_point || '',
+        note: q.note || ''
+      });
+    });
+  }
+
+  // 删除原图（分析完不保留）
+  try { fs.unlinkSync(fullPath); } catch (e) { console.log('删除图片失败:', e.message); }
+
+  res.json({ ...exam, ai_result: aiResult });
+});
+
+// 查询试卷列表
+app.get('/api/exams', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const filters = {};
+  if (req.query.subject) filters.subject = req.query.subject;
+  if (req.query.exam_type) filters.exam_type = req.query.exam_type;
+  const exams = db.getExams(studentId, filters);
+  res.json(exams);
+});
+
+// 查询试卷详情（含题目）
+app.get('/api/exams/:id', authenticateToken, (req, res) => {
+  const exam = db.getExamById(parseInt(req.params.id));
+  if (!exam) return res.status(404).json({ error: '试卷不存在' });
+  const questions = db.getExamQuestions(exam.id);
+  res.json({ ...exam, questions });
+});
+
+// 删除试卷
+app.delete('/api/exams/:id', authenticateToken, requireParent, (req, res) => {
+  const success = db.deleteExam(parseInt(req.params.id));
+  res.json({ success });
+});
+
+// 查询趋势数据
+app.get('/api/exams/trend/:subject', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const trend = db.getExamTrend(studentId, req.params.subject);
+  res.json(trend);
+});
+
+// 月度报告
+app.get('/api/exams/monthly/:month', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const stats = db.getMonthlyExamStats(studentId, req.params.month);
+  res.json(stats);
+});
+
+// ============ 头像管理 ============
+
+// 获取所有头像（公开）
+app.get('/api/avatars', (req, res) => {
+  const avatars = db.getAllAvatars();
+  res.json(avatars);
+});
+
+// 获取学生已购买的头像
+app.get('/api/avatars/mine', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const avatars = db.getStudentAvatars(studentId);
+  res.json(avatars);
+});
+
+// 上传新头像（家长）
+app.post('/api/avatars', authenticateToken, requireParent, upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: '请上传头像图片' });
+  }
+  const { name, price } = req.body;
+  if (!name || price === undefined) {
+    return res.status(400).json({ error: '请填写头像名称和价格' });
+  }
+  const avatar = db.createAvatar({
+    name,
+    price: parseInt(price),
+    image_url: `/xuexi/uploads/${req.file.filename}`
+  });
+  res.json(avatar);
+});
+
+// 修改头像（家长）
+app.put('/api/avatars/:id', authenticateToken, requireParent, (req, res) => {
+  const { name, price } = req.body;
+  const updates = {};
+  if (name !== undefined) updates.name = name;
+  if (price !== undefined) updates.price = parseInt(price);
+  const success = db.updateAvatar(parseInt(req.params.id), updates);
+  res.json({ success });
+});
+
+// 删除头像（家长）
+app.delete('/api/avatars/:id', authenticateToken, requireParent, (req, res) => {
+  const success = db.deleteAvatar(parseInt(req.params.id));
+  res.json({ success });
+});
+
+// 购买头像（学生）
+app.post('/api/avatars/:id/purchase', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.body.student_id);
+  const avatarId = parseInt(req.params.id);
+  const result = db.purchaseAvatar(studentId, avatarId);
+  if (!result.success) {
+    return res.status(400).json(result);
+  }
+  res.json(result);
+});
+
+// 设置当前头像（学生）
+app.put('/api/students/avatar', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.body.student_id);
+  const { avatar_id } = req.body;
+  
+  // 验证学生是否拥有该头像
+  if (avatar_id) {
+    const owned = db.getStudentAvatars(studentId);
+    if (!owned.find(a => a.id === avatar_id)) {
+      return res.status(400).json({ error: '未拥有该头像' });
+    }
+  }
+  
+  const success = db.setStudentAvatar(studentId, avatar_id);
+  res.json({ success });
+});
+
+// 获取当前头像信息
+app.get('/api/students/avatar', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const user = db.getUserById(studentId);
+  if (!user || !user.avatar_id) {
+    return res.json(null);
+  }
+  const avatar = db.getAvatarById(user.avatar_id);
+  res.json(avatar);
+});
+
 // ============ 上传/通用错误处理（返回 JSON 而不是 HTML） ============
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
@@ -923,4 +1259,104 @@ initDefaultRewards(); // 初始化默认奖励
 
 app.listen(PORT, () => {
   console.log(`🚀 小石榴学习管理系统后端运行在 http://localhost:${PORT}`);
+});
+
+// 自定义积分修改（加分/减分）
+app.post('/api/points/custom', authenticateToken, requireParent, (req, res) => {
+  const { student_id, points, reason } = req.body;
+  if (!student_id || points === undefined || !reason) {
+    return res.status(400).json({ error: '缺少学生ID、积分数量或原因' });
+  }
+  
+  const d = loadData();
+  const studentId = parseInt(student_id);
+  const pointsNum = parseInt(points);
+  const date = new Date().toISOString().split('T')[0];
+  
+  // 添加积分流水记录
+  d.points_ledger.push({
+    id: d._meta.nextId.points_ledger++,
+    student_id: studentId,
+    points: pointsNum,
+    source: 'custom',
+    description: reason,
+    date,
+    created_at: new Date().toISOString()
+  });
+  saveData();
+  
+  res.json({ success: true, message: '积分修改成功' });
+});
+
+// 自定义积分修改（加分/减分）
+app.post('/api/points/custom', authenticateToken, requireParent, (req, res) => {
+  const { student_id, points, reason } = req.body;
+  if (!student_id || points === undefined || !reason) {
+    return res.status(400).json({ error: '缺少学生ID、积分数量或原因' });
+  }
+  
+  const d = loadData();
+  const studentId = parseInt(student_id);
+  const pointsNum = parseInt(points);
+  const date = new Date().toISOString().split('T')[0];
+  
+  // 添加积分流水记录
+  d.points_ledger.push({
+    id: d._meta.nextId.points_ledger++,
+    student_id: studentId,
+    points: pointsNum,
+    source: 'custom',
+    description: reason,
+    date,
+    created_at: new Date().toISOString()
+  });
+  saveData();
+  
+  res.json({ success: true, message: '积分修改成功' });
+});
+
+// 获取所有历史任务模板（去重，用于添加任务功能）
+app.get('/api/tasks/history', authenticateToken, requireParent, (req, res) => {
+  const tasks = db.getAllTasks();
+  // 只返回顶级任务（parent_id=0），子任务会在展开时显示
+  const topLevelTasks = tasks.filter(t => !t.parent_id || t.parent_id === 0);
+  res.json(topLevelTasks);
+});
+
+// 添加已有任务到指定日期的打卡清单
+app.post('/api/checkins/add-task', authenticateToken, requireParent, (req, res) => {
+  const { student_id, task_id, date } = req.body;
+  if (!student_id || !task_id || !date) {
+    return res.status(400).json({ error: '缺少学生ID、任务ID或日期' });
+  }
+  
+  const d = loadData();
+  const studentId = parseInt(student_id);
+  const taskId = parseInt(task_id);
+  
+  // 检查是否已存在
+  const existing = d.checkins.find(c => 
+    c.student_id === studentId && 
+    c.task_id === taskId && 
+    c.date === date
+  );
+  
+  if (existing) {
+    return res.status(400).json({ error: '该任务已在当天打卡清单中' });
+  }
+  
+  // 添加打卡记录
+  d.checkins.push({
+    id: d._meta.nextId.checkins++,
+    student_id: studentId,
+    task_id: taskId,
+    date: date,
+    is_completed: 0,
+    quality: null,
+    note: '',
+    created_at: new Date().toISOString()
+  });
+  saveData();
+  
+  res.json({ success: true, message: '任务已添加到打卡清单' });
 });
