@@ -8,6 +8,176 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+/* 纸娃娃换装系统样式 */
+.dressup-container {
+    padding: 20px;
+}
+
+.character-display {
+    position: relative;
+    width: 300px;
+    height: 400px;
+    margin: 0 auto 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.character-base {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2YwZjBmMCIvPjxjaXJjbGUgY3g9IjE1MCIgY3k9IjEwMCIgcj0iNDAiIGZpbGw9IiNmZmQ3ZDciLz48cmVjdCB4PSIxMzAiIHk9IjE0MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2ZmZDdkNyIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iNDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjZmZkN2Q3Ii8+PHJlY3QgeD0iMTYwIiB5PSIyNDAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNmZmQ3ZDciLz48L3N2Zz4=');
+}
+
+.character-outfit {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.outfit-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.outfit-categories {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.category-btn {
+    padding: 10px 20px;
+    border: none;
+    background: #f0f0f0;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.category-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.outfit-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.outfit-item {
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.outfit-item:hover {
+    transform: translateY(-5px);
+}
+
+.outfit-item.owned {
+    border: 3px solid #4CAF50;
+}
+
+.outfit-item.equipped {
+    border: 3px solid #667eea;
+    background: #f0f4ff;
+}
+
+.outfit-preview {
+    width: 100%;
+    height: 150px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.outfit-name {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.outfit-category {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.outfit-price {
+    font-size: 14px;
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.outfit-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-buy, .btn-equip, .btn-unequip {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.btn-buy {
+    background: #ff6b6b;
+    color: white;
+}
+
+.btn-buy:hover {
+    background: #ff5252;
+}
+
+.btn-equip {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-equip:hover {
+    background: #45a049;
+}
+
+.btn-unequip {
+    background: #9e9e9e;
+    color: white;
+}
+
+.btn-unequip:hover {
+    background: #757575;
+}
+
+.btn-buy:disabled, .btn-equip:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -1386,6 +1556,36 @@
             </div>
             <div id="redemptionHistory"></div>
         </div>
+        <div class="page" id="page-dressup">
+            <div class="header">
+                <div class="header-top">
+                    <div class="greeting">👗 纸娃娃换装</div>
+                    <div class="header-avatar">⭐</div>
+                </div>
+            </div>
+
+            <div class="dressup-container">
+                <!-- 角色展示区 -->
+                <div class="character-display">
+                    <div class="character-base"></div>
+                    <div class="character-outfit" id="characterOutfit"></div>
+                </div>
+
+                <!-- 服装分类标签 -->
+                <div class="outfit-categories">
+                    <button class="category-btn active" data-category="all">全部</button>
+                    <button class="category-btn" data-category="hair">头发</button>
+                    <button class="category-btn" data-category="top">上衣</button>
+                    <button class="category-btn" data-category="bottom">下装</button>
+                    <button class="category-btn" data-category="shoes">鞋子</button>
+                    <button class="category-btn" data-category="hat">帽子</button>
+                    <button class="category-btn" data-category="accessory">配饰</button>
+                </div>
+
+                <!-- 服装列表 -->
+                <div class="outfit-list" id="outfitList"></div>
+            </div>
+        </div>
 
         <!-- 底部导航 -->
         <div class="bottom-nav">
@@ -1393,13 +1593,13 @@
                 <span class="nav-icon">📋</span>
                 <span class="nav-label">今日</span>
             </div>
-            <div class="nav-item" data-page="submit" onclick="switchPage('submit')">
-                <span class="nav-icon">📸</span>
-                <span class="nav-label">提交</span>
-            </div>
             <div class="nav-item" data-page="avatar" onclick="switchPage('avatar')">
                 <span class="nav-icon">🎨</span>
                 <span class="nav-label">头像</span>
+            </div>
+            <div class="nav-item" data-page="dressup" onclick="switchPage('dressup')">
+                <span class="nav-icon">👗</span>
+                <span class="nav-label">换装</span>
             </div>
             <div class="nav-item" data-page="points" onclick="switchPage('points')">
                 <span class="nav-icon">🏆</span>
@@ -1411,6 +1611,7 @@
             </div>
         </div>
     </div>
+</div>
 
     <!-- 作业提交模态框 -->
     <div class="modal-overlay" id="submitModal">
@@ -1431,6 +1632,203 @@
     </div>
 
     <script>
+
+// 纸娃娃换装系统
+let allOutfits = [];
+let ownedOutfits = [];
+let currentOutfit = {};
+let currentCategory = 'all';
+
+// 加载换装页面
+async function loadDressupPage() {
+    await Promise.all([
+        loadAllOutfits(),
+        loadOwnedOutfits(),
+        loadCurrentOutfit()
+    ]);
+    renderOutfitList();
+    renderCharacter();
+}
+
+// 加载所有服装
+async function loadAllOutfits() {
+    const res = await fetch('/xuexi/api/outfits', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    allOutfits = await res.json();
+}
+
+// 加载已拥有的服装
+async function loadOwnedOutfits() {
+    const res = await fetch('/xuexi/api/outfits/mine', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    ownedOutfits = await res.json();
+}
+
+// 加载当前装扮
+async function loadCurrentOutfit() {
+    const res = await fetch('/xuexi/api/students/outfit', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    currentOutfit = await res.json();
+}
+
+// 渲染服装列表
+function renderOutfitList() {
+    const list = document.getElementById('outfitList');
+    let filtered = currentCategory === 'all' 
+        ? allOutfits 
+        : allOutfits.filter(o => o.category === currentCategory);
+    
+    list.innerHTML = filtered.map(outfit => {
+        const owned = ownedOutfits.some(o => o.id === outfit.id);
+        const equipped = currentOutfit[outfit.category] === outfit.id;
+        
+        let actions = '';
+        if (!owned) {
+            actions = '<button class="btn-buy" onclick="buyOutfit(' + outfit.id + ')">购买 ' + outfit.price + '金币</button>';
+        } else if (equipped) {
+            actions = '<button class="btn-unequip" onclick="unequipOutfit(\'' + outfit.category + '\')">卸下</button>';
+        } else {
+            actions = '<button class="btn-equip" onclick="equipOutfit(' + outfit.id + ', \'' + outfit.category + '\')">装备</button>';
+        }
+        
+        return '<div class="outfit-item ' + (owned ? 'owned' : '') + ' ' + (equipped ? 'equipped' : '') + '">' +
+            '<div class="outfit-preview" style="background-color: ' + getOutfitColor(outfit.category) + '; background-image: url(' + outfit.image_url + ');"></div>' +
+            '<div class="outfit-name">' + outfit.name + '</div>' +
+            '<div class="outfit-category">' + getCategoryName(outfit.category) + '</div>' +
+            (owned ? '<div class="outfit-price">已拥有</div>' : '<div class="outfit-price">' + outfit.price + ' 金币</div>') +
+            '<div class="outfit-actions">' + actions + '</div>' +
+            '</div>';
+    }).join('');
+}
+
+// 获取分类中文名
+function getCategoryName(category) {
+    const names = {
+        'hair': '头发',
+        'top': '上衣',
+        'bottom': '下装',
+        'shoes': '鞋子',
+        'hat': '帽子',
+        'accessory': '配饰'
+    };
+    return names[category] || category;
+}
+
+// 获取服装颜色（用于预览）
+function getOutfitColor(category) {
+    const colors = {
+        'hair': '#FFB6C1',
+        'top': '#87CEEB',
+        'bottom': '#98D8C8',
+        'shoes': '#DDA0DD',
+        'hat': '#F0E68C',
+        'accessory': '#DDA0DD'
+    };
+    return colors[category] || '#f0f0f0';
+}
+
+// 购买服装
+async function buyOutfit(outfitId) {
+    const res = await fetch('/xuexi/api/outfits/' + outfitId + '/purchase', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ student_id: currentUser.id })
+    });
+    
+    const result = await res.json();
+    if (result.success) {
+        alert('购买成功！');
+        await loadOwnedOutfits();
+        await loadPointsPage();
+        renderOutfitList();
+    } else {
+        alert('购买失败：' + result.error);
+    }
+}
+
+// 装备服装
+async function equipOutfit(outfitId, category) {
+    currentOutfit[category] = outfitId;
+    
+    const res = await fetch('/xuexi/api/students/outfit', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+            student_id: currentUser.id,
+            ...currentOutfit
+        })
+    });
+    
+    const result = await res.json();
+    if (result.success) {
+        renderOutfitList();
+        renderCharacter();
+    }
+}
+
+// 卸下服装
+async function unequipOutfit(category) {
+    currentOutfit[category] = null;
+    
+    const res = await fetch('/xuexi/api/students/outfit', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+            student_id: currentUser.id,
+            ...currentOutfit
+        })
+    });
+    
+    const result = await res.json();
+    if (result.success) {
+        renderOutfitList();
+        renderCharacter();
+    }
+}
+
+// 渲染角色
+function renderCharacter() {
+    const outfitContainer = document.getElementById('characterOutfit');
+    let layers = '';
+    
+    // 按z_index排序
+    const equippedItems = Object.entries(currentOutfit)
+        .filter(([category, id]) => id !== null)
+        .map(([category, id]) => {
+            const outfit = allOutfits.find(o => o.id === id);
+            return outfit;
+        })
+        .filter(o => o)
+        .sort((a, b) => a.z_index - b.z_index);
+    
+    equippedItems.forEach(outfit => {
+        layers += '<div class="outfit-layer" style="background-image: url(' + outfit.image_url + '); background-color: ' + getOutfitColor(outfit.category) + '; opacity: 0.9;"></div>';
+    });
+    
+    outfitContainer.innerHTML = layers;
+}
+
+// 分类切换
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('category-btn')) {
+        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        currentCategory = e.target.dataset.category;
+        renderOutfitList();
+    }
+});
         const API_BASE = '/xuexi/api';
         let token = localStorage.getItem('xuexi_student_token');
         let currentUser = JSON.parse(localStorage.getItem('xuexi_student_user') || 'null');
@@ -1592,6 +1990,7 @@
             if (page === 'reading') loadBooks();
             if (page === 'points') loadPointsPage();
             if (page === 'avatar') loadAvatarGallery();
+            if (page === 'dressup') loadDressupPage();
         }
 
         async function loadTodayTasks() {
