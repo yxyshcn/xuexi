@@ -2118,21 +2118,6 @@
             </div>
         </div>
     </div>
-    <!-- 历史任务选择模态框（多选批量添加） -->
-    <div class="modal-overlay" id="historyTaskModal">
-        <div class="modal-box">
-            <h3>选择历史任务（可多选）</h3>
-            <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
-                <label style="cursor:pointer;font-size:14px;"><input type="checkbox" id="selectAllTasks" onchange="toggleSelectAll()"> 全选</label>
-                <span id="selectedCount" style="font-size:13px;color:var(--text-secondary);margin-left:auto;">已选 0 个</span>
-            </div>
-            <div id="historyTaskList" style="max-height:400px;overflow-y:auto;margin:8px 0;"></div>
-            <div class="modal-actions">
-                <button class="btn-small secondary" onclick="closeHistoryTaskModal()">取消</button>
-                <button class="btn-small primary" id="batchAddBtn" onclick="batchAddHistoryTasks()" disabled>确认添加（0）</button>
-            </div>
-        </div>
-    </div>
 
 
     <script>
@@ -3764,6 +3749,8 @@
         }
 
     </script>
+</body>
+</html>
 
 <script>
 async function submitCustomPoints() {
@@ -3823,9 +3810,8 @@ async function submitCustomPoints() {
     }
 }
 </script>
-<script>
 
-// 显示历史任务选择弹窗（多选模式）
+// 显示历史任务选择弹窗
 async function showHistoryTaskModal() {
     const date = document.getElementById('taskConfigDate').value;
     if (!date) {
@@ -3839,131 +3825,61 @@ async function showHistoryTaskModal() {
         });
         const tasks = await res.json();
         
-        // 获取当天已有的任务ID，用于标记已添加的
-        const dateRes = await fetch('/xuexi/api/checkins/' + date + '?student_id=' + studentId, {
-            headers: { 'Authorization': 'Bearer ' + token }
-        });
-        const dateTasks = await dateRes.json();
-        const existingTaskIds = new Set();
-        dateTasks.forEach(t => {
-            existingTaskIds.add(t.id);
-            if (t.sub_tasks) t.sub_tasks.forEach(st => existingTaskIds.add(st.id));
-        });
-        
-        let html = '';
+        let html = '<div style="max-height:400px;overflow-y:auto;">';
         tasks.forEach(task => {
-            const isExisting = existingTaskIds.has(task.id);
-            const subCount = (task.sub_tasks && task.sub_tasks.length > 0) ? '<div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">包含 ' + task.sub_tasks.length + ' 个子任务</div>' : '';
-            const disabledAttr = isExisting ? 'disabled' : '';
-            const opacityStyle = isExisting ? 'opacity:0.5;' : '';
-            const existingTag = isExisting ? '<span style="font-size:11px;color:var(--accent);margin-left:6px;">（已添加）</span>' : '';
-            
-            html += '<label style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;' + opacityStyle + '" class="task-checkbox-item">';
-            html += '<input type="checkbox" class="task-checkbox" value="' + task.id + '" data-name="' + task.name.replace(/"/g, '&quot;') + '" onchange="updateSelectedCount()" ' + disabledAttr + ' style="margin-right:10px;width:18px;height:18px;flex-shrink:0;">';
-            html += '<div><div style="font-weight:600;">' + task.icon + ' ' + task.name + existingTag + '</div>';
+            const safeName = task.name.replace(/'/g, "\\'");
+            const subCount = (task.sub_tasks && task.sub_tasks.length > 0) ? '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">包含 ' + task.sub_tasks.length + ' 个子任务</div>' : '';
+            html += '<div style="padding:12px;border-bottom:1px solid var(--border);cursor:pointer;" onclick="addHistoryTask(' + task.id + ', \'' + safeName + '\')">';
+            html += '<div style="font-weight:600;">' + task.icon + ' ' + task.name + '</div>';
             html += subCount;
-            html += '</div></label>';
+            html += '</div>';
         });
+        html += '</div>';
         
-        document.getElementById('historyTaskList').innerHTML = html;
-        document.getElementById('selectAllTasks').checked = false;
-        updateSelectedCount();
-        document.getElementById('historyTaskModal').classList.add('active');
+        showModal('选择历史任务', html);
     } catch (e) {
         console.error('加载历史任务失败:', e);
         alert('加载历史任务失败');
     }
 }
 
-function closeHistoryTaskModal() {
-    document.getElementById('historyTaskModal').classList.remove('active');
-}
-
-// 全选/取消全选
-function toggleSelectAll() {
-    const checked = document.getElementById('selectAllTasks').checked;
-    const checkboxes = document.querySelectorAll('.task-checkbox:not(:disabled)');
-    checkboxes.forEach(cb => { cb.checked = checked; });
-    updateSelectedCount();
-}
-
-// 更新已选数量和按钮状态
-function updateSelectedCount() {
-    const checkboxes = document.querySelectorAll('.task-checkbox:checked');
-    const count = checkboxes.length;
-    document.getElementById('selectedCount').textContent = '已选 ' + count + ' 个';
-    const btn = document.getElementById('batchAddBtn');
-    btn.textContent = '确认添加（' + count + '）';
-    btn.disabled = count === 0;
-    
-    // 同步全选checkbox状态
-    const allEnabled = document.querySelectorAll('.task-checkbox:not(:disabled)');
-    const allChecked = document.querySelectorAll('.task-checkbox:checked');
-    document.getElementById('selectAllTasks').checked = allEnabled.length > 0 && allEnabled.length === allChecked.length;
-}
-
-// 批量添加历史任务到当天打卡清单
-async function batchAddHistoryTasks() {
+// 添加历史任务到当天打卡清单
+async function addHistoryTask(taskId, taskName) {
     const date = document.getElementById('taskConfigDate').value;
     if (!date) {
         alert('请先选择日期');
         return;
     }
     
-    const checkboxes = document.querySelectorAll('.task-checkbox:checked');
-    if (checkboxes.length === 0) return;
+    if (!confirm('确定将"' + taskName + '"添加到' + date + '的打卡清单吗？')) {
+        return;
+    }
     
-    const taskList = Array.from(checkboxes).map(cb => ({
-        id: parseInt(cb.value),
-        name: cb.dataset.name
-    }));
-    
-    const btn = document.getElementById('batchAddBtn');
-    btn.disabled = true;
-    btn.textContent = '添加中...';
-    
-    let successCount = 0;
-    let failCount = 0;
-    let failNames = [];
-    
-    for (const task of taskList) {
-        try {
-            const res = await fetch('/xuexi/api/checkins/add-task', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
-                body: JSON.stringify({
-                    student_id: studentId,
-                    task_id: task.id,
-                    date: date
-                })
-            });
-            const result = await res.json();
-            if (result.success) {
-                successCount++;
-            } else {
-                failCount++;
-                failNames.push(task.name);
-            }
-        } catch (e) {
-            failCount++;
-            failNames.push(task.name);
-            console.error('添加任务失败:', task.name, e);
+    try {
+        const res = await fetch('/xuexi/api/checkins/add-task', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                student_id: studentId,
+                task_id: taskId,
+                date: date
+            })
+        });
+        
+        const result = await res.json();
+        
+        if (result.success) {
+            alert('✓ 任务已添加到打卡清单');
+            closeModal();
+            loadTaskConfig();
+        } else {
+            alert('✗ ' + (result.error || '添加失败'));
         }
+    } catch (e) {
+        console.error('添加任务失败:', e);
+        alert('添加任务失败');
     }
-    
-    // 显示结果
-    if (failCount === 0) {
-        alert('✓ 成功添加 ' + successCount + ' 个任务到 ' + date + ' 的打卡清单');
-    } else {
-        alert('添加完成：成功 ' + successCount + ' 个，失败 ' + failCount + ' 个\n失败任务：' + failNames.join('、'));
-    }
-    
-    closeHistoryTaskModal();
-    loadTaskConfig();
 }
-</script>
-</body>
-</html>

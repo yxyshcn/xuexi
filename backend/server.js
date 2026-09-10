@@ -877,19 +877,21 @@ app.get('/api/points/weekly-check', authenticateToken, requireParent, (req, res)
   let qualifiedDays = 0;
   let exemptUsed = false;
   const dailyDetails = [];
+  // 获取所有有效任务ID
+  const validTaskIds = new Set(d.task_templates.map(t => t.id));
 
   dates.forEach(date => {
-    const dayCheckins = byDate[date];
-    const allQualified = dayCheckins.every(c => c.quality !== null && c.quality >= 1);
+    const validCheckins = byDate[date].filter(c => validTaskIds.has(c.task_id));
+    const allQualified = validCheckins.every(c => c.quality !== null && c.quality >= 1);
     if (allQualified) {
       qualifiedDays++;
-      dailyDetails.push({ date, status: 'qualified', count: dayCheckins.length });
+      dailyDetails.push({ date, status: 'qualified', count: validCheckins.length });
     } else {
       if (!exemptUsed) {
         exemptUsed = true;
-        dailyDetails.push({ date, status: 'exempt', count: dayCheckins.length });
+        dailyDetails.push({ date, status: 'exempt', count: validCheckins.length });
       } else {
-        dailyDetails.push({ date, status: 'failed', count: dayCheckins.length });
+        dailyDetails.push({ date, status: 'failed', count: validCheckins.length });
       }
     }
   });
@@ -1359,4 +1361,147 @@ app.post('/api/checkins/add-task', authenticateToken, requireParent, (req, res) 
   saveData();
   
   res.json({ success: true, message: '任务已添加到打卡清单' });
+});
+
+// ============ 纸娃娃服装系统 API ============
+
+// 获取所有服装（按分类）
+app.get('/api/outfits', authenticateToken, (req, res) => {
+  const d = loadData();
+  const category = req.query.category;
+  
+  let outfits = d.outfits || [];
+  if (category && category !== 'all') {
+    outfits = outfits.filter(o => o.category === category);
+  }
+  
+  res.json(outfits);
+});
+
+// 获取学生已购买的服装
+app.get('/api/outfits/mine', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const d = loadData();
+  
+  const myOutfits = (d.student_outfits || [])
+    .filter(so => so.student_id === studentId)
+    .map(so => {
+      const outfit = (d.outfits || []).find(o => o.id === so.outfit_id);
+      return outfit ? { ...outfit, purchased_at: so.purchased_at } : null;
+    })
+    .filter(o => o !== null);
+  
+  res.json(myOutfits);
+});
+
+// 购买服装
+app.post('/api/outfits/:id/purchase', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.body.student_id);
+  const outfitId = parseInt(req.params.id);
+  const d = loadData();
+  
+  // 检查服装是否存在
+  const outfit = (d.outfits || []).find(o => o.id === outfitId);
+  if (!outfit) {
+    return res.status(404).json({ error: '服装不存在' });
+  }
+  
+  // 检查是否已购买
+  const alreadyOwned = (d.student_outfits || []).some(so => 
+    so.student_id === studentId && so.outfit_id === outfitId
+  );
+  if (alreadyOwned) {
+    return res.status(400).json({ error: '已拥有该服装' });
+  }
+  
+  // 检查积分是否足够
+  const balance = db.getPointsBalance(studentId);
+  if (balance < outfit.price) {
+    return res.status(400).json({ error: '金币不足', balance, price: outfit.price });
+  }
+  
+  // 扣除积分
+  db.addPoints({
+    student_id: studentId,
+    points: -outfit.price,
+    source: 'outfit_purchase',
+    description: '购买服装: ' + outfit.name,
+    date: getLocalDate()
+  });
+  
+  // 添加购买记录
+  if (!d.student_outfits) d.student_outfits = [];
+  d.student_outfits.push({
+    id: d._meta.nextId.student_outfits++,
+    student_id: studentId,
+    outfit_id: outfitId,
+    purchased_at: new Date().toISOString()
+  });
+  
+  saveData();
+  
+  const newBalance = db.getPointsBalance(studentId);
+  res.json({ success: true, new_balance: newBalance, outfit });
+});
+
+// 获取学生当前装扮
+app.get('/api/students/outfit', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.query.student_id);
+  const d = loadData();
+  
+  const currentOutfit = (d.student_current_outfit || []).find(co => co.student_id === studentId);
+  
+  if (!currentOutfit) {
+    // 返回默认装扮（全部null）
+    return res.json({
+      student_id: studentId,
+      hair: null,
+      top: null,
+      bottom: null,
+      shoes: null,
+      hat: null,
+      accessory: null
+    });
+  }
+  
+  res.json(currentOutfit);
+});
+
+// 设置学生当前装扮
+app.put('/api/students/outfit', authenticateToken, (req, res) => {
+  const studentId = req.user.role === 'student' ? req.user.id : parseInt(req.body.student_id);
+  const { hair, top, bottom, shoes, hat, accessory } = req.body;
+  const d = loadData();
+  
+  // 验证所有服装是否已购买
+  const outfitIds = [hair, top, bottom, shoes, hat, accessory].filter(id => id !== null);
+  for (const outfitId of outfitIds) {
+    const owned = (d.student_outfits || []).some(so => 
+      so.student_id === studentId && so.outfit_id === outfitId
+    );
+    if (!owned) {
+      return res.status(400).json({ error: '未拥有该服装', outfit_id: outfitId });
+    }
+  }
+  
+  // 查找或创建当前装扮记录
+  let currentOutfit = (d.student_current_outfit || []).find(co => co.student_id === studentId);
+  
+  if (!currentOutfit) {
+    if (!d.student_current_outfit) d.student_current_outfit = [];
+    currentOutfit = { student_id: studentId };
+    d.student_current_outfit.push(currentOutfit);
+  }
+  
+  // 更新装扮
+  currentOutfit.hair = hair || null;
+  currentOutfit.top = top || null;
+  currentOutfit.bottom = bottom || null;
+  currentOutfit.shoes = shoes || null;
+  currentOutfit.hat = hat || null;
+  currentOutfit.accessory = accessory || null;
+  
+  saveData();
+  
+  res.json({ success: true, outfit: currentOutfit });
 });

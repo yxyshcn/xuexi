@@ -4,52 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小石榴学习管理台</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            /* 动森色板 - Animal Crossing Palette */
-            --bg: #f8f8f0;
-            --card: rgb(247, 243, 223);
-            --border: #e8e2d6;
-            --text: #725d42;
-            --text-secondary: #8a7b66;
-            --text-muted: #9f927d;
-            --primary: #19c8b9;
-            --primary-hover: #3dd4c6;
-            --primary-active: #50b9ab;
-            --primary-light: #e6f9f6;
-            --accent: #f7cd67;
-            --accent-light: #fdf6e3;
-            --danger: #fc736d;
-            --danger-light: #fde8e7;
-            --info: #889df0;
-            --info-light: #e8ecfc;
-            --purple: #b77dee;
-            --purple-light: #f3eafc;
-            --sidebar-bg: #5a4a3a;
-            --sidebar-text: #d4c9b4;
-            --sidebar-active: #19c8b9;
-            --shadow: 0 2px 4px 0 rgba(61, 52, 40, 0.06);
-            --shadow-md: 0 3px 10px 0 rgba(61, 52, 40, 0.10);
-            --radius: 20px;
-            --radius-sm: 16px;
-            --btn-3d-shadow: #bdaea0;
-            --focus-yellow: #ffcc00;
+            --bg: #f5f5f0;
+            --card: #ffffff;
+            --border: #e8e4dc;
+            --text: #2d2d2d;
+            --text-secondary: #6b6b6b;
+            --text-muted: #999999;
+            --primary: #4a7c59;
+            --primary-light: #e8f0eb;
+            --accent: #d4a574;
+            --accent-light: #faf3eb;
+            --danger: #c0392b;
+            --danger-light: #fceae8;
+            --info: #5b8fa8;
+            --info-light: #e8f2f7;
+            --purple: #7c6da0;
+            --purple-light: #f0edf5;
+            --sidebar-bg: #2c3e2d;
+            --sidebar-text: #b8c9b9;
+            --sidebar-active: #4a7c59;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --radius: 12px;
+            --radius-sm: 8px;
         }
 
         body {
-            font-family: Nunito, 'Noto Sans SC', 'Zen Maru Gothic', 'HarmonyOS Sans SC', -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             line-height: 1.5;
-            font-weight: 500;
-            letter-spacing: 0.01em;
         }
 
         /* ========== 登录页 ========== */
@@ -58,16 +48,15 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #e6f9f6 0%, #fdf6e3 50%, #f8f8f0 100%);
+            background: linear-gradient(135deg, #e8f0eb 0%, #faf3eb 50%, #f5f0e8 100%);
         }
 
         .login-card {
-            background: rgb(247, 243, 223);
-            border-radius: 24px;
+            background: white;
+            border-radius: 20px;
             padding: 48px 40px;
             width: 400px;
-            box-shadow: 0 8px 24px rgba(114, 93, 66, 0.15);
-            border: 2px solid var(--border);
+            box-shadow: var(--shadow-md);
         }
 
         .login-card .logo {
@@ -79,7 +68,7 @@
             width: 64px;
             height: 64px;
             background: var(--primary-light);
-            border-radius: 20px;
+            border-radius: 16px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -89,7 +78,7 @@
 
         .login-card h1 {
             font-size: 22px;
-            font-weight: 700;
+            font-weight: 600;
             color: var(--text);
             margin-bottom: 4px;
         }
@@ -106,27 +95,26 @@
         .form-group label {
             display: block;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             color: var(--text-secondary);
             margin-bottom: 6px;
         }
 
         .form-input {
             width: 100%;
-            padding: 12px 18px;
-            border: none;
-            border-radius: 50px;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
             font-size: 15px;
-            font-weight: 500;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #fffbe7;
-            color: var(--text);
+            transition: all 0.2s;
+            background: #fafafa;
         }
 
         .form-input:focus {
-            outline: 2px solid var(--focus-yellow);
-            outline-offset: 2px;
-            background: #fff;
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
         }
 
         .btn-primary {
@@ -135,24 +123,17 @@
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 50px;
+            border-radius: 10px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 5px 0 0 var(--btn-3d-shadow);
-            letter-spacing: 0.02em;
+            transition: all 0.2s;
         }
 
         .btn-primary:hover {
-            background: var(--primary-hover);
+            background: #3d6a4a;
             transform: translateY(-1px);
-            box-shadow: 0 6px 0 0 var(--btn-3d-shadow);
-        }
-
-        .btn-primary:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 0 var(--btn-3d-shadow);
+            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.3);
         }
 
         .login-error {
@@ -185,7 +166,6 @@
             display: flex;
             flex-direction: column;
             z-index: 100;
-            border-radius: 0 24px 24px 0;
         }
 
         .sidebar-brand {
@@ -195,7 +175,7 @@
 
         .sidebar-brand h2 {
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 600;
             color: white;
             display: flex;
             align-items: center;
@@ -203,14 +183,14 @@
         }
 
         .sidebar-brand .brand-icon {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             background: var(--primary);
-            border-radius: 12px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .sidebar-user {
@@ -224,20 +204,20 @@
         .user-avatar {
             width: 36px;
             height: 36px;
-            background: var(--accent);
+            background: var(--primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
-            color: #725d42;
-            font-weight: 700;
+            color: white;
+            font-weight: 600;
         }
 
         .user-info .user-name {
             font-size: 14px;
             color: white;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .user-info .user-role {
@@ -256,48 +236,49 @@
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: rgba(255,255,255,0.35);
-            font-weight: 700;
+            color: rgba(255,255,255,0.3);
+            font-weight: 600;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
             padding: 10px 20px;
-            margin: 1px 8px;
             cursor: pointer;
             transition: all 0.15s;
             font-size: 14px;
-            font-weight: 600;
             color: var(--sidebar-text);
-            border-radius: 12px;
+            border-left: 3px solid transparent;
             gap: 12px;
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.05);
             color: white;
         }
 
         .nav-item.active {
-            background: rgba(25, 200, 185, 0.25);
+            background: rgba(74, 124, 89, 0.2);
             color: white;
+            border-left-color: var(--primary);
         }
 
         .nav-item.nav-subitem {
             padding-left: 48px;
             font-size: 13px;
-            color: rgba(212, 201, 180, 0.75);
+            color: rgba(184, 201, 185, 0.75);
+            border-left: 3px solid transparent;
         }
 
         .nav-item.nav-subitem:hover {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.05);
             color: white;
         }
 
         .nav-item.nav-subitem.active {
-            background: rgba(247, 205, 103, 0.2);
+            background: rgba(74, 124, 89, 0.15);
             color: white;
+            border-left-color: var(--accent);
         }
 
         .nav-item .nav-icon {
@@ -311,9 +292,9 @@
             background: var(--danger);
             color: white;
             font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
         }
 
         .sidebar-footer {
@@ -334,8 +315,8 @@
         }
 
         .topbar {
-            background: rgb(247, 243, 223);
-            border-bottom: 2px solid var(--border);
+            background: white;
+            border-bottom: 1px solid var(--border);
             padding: 16px 32px;
             display: flex;
             align-items: center;
@@ -347,8 +328,7 @@
 
         .topbar-title h1 {
             font-size: 18px;
-            font-weight: 700;
-            color: var(--text);
+            font-weight: 600;
         }
 
         .topbar-title .breadcrumb {
@@ -366,10 +346,9 @@
         .topbar-date {
             font-size: 13px;
             color: var(--text-secondary);
-            padding: 6px 14px;
-            background: #fffbe7;
-            border-radius: 50px;
-            font-weight: 600;
+            padding: 6px 12px;
+            background: var(--bg);
+            border-radius: 6px;
         }
 
         .page-content {
@@ -401,16 +380,11 @@
         }
 
         .kpi-card {
-            background: rgb(247, 243, 223);
-            border-radius: 20px;
+            background: white;
+            border-radius: var(--radius);
             padding: 20px;
             box-shadow: var(--shadow);
-            border: 2px solid var(--border);
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-2px);
+            border: 1px solid var(--border);
         }
 
         .kpi-card .kpi-header {
@@ -423,7 +397,7 @@
         .kpi-card .kpi-icon {
             width: 40px;
             height: 40px;
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -437,9 +411,9 @@
 
         .kpi-card .kpi-trend {
             font-size: 12px;
-            padding: 2px 10px;
-            border-radius: 50px;
-            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 500;
         }
 
         .kpi-card .kpi-trend.up { background: var(--primary-light); color: var(--primary); }
@@ -447,7 +421,7 @@
 
         .kpi-card .kpi-value {
             font-size: 28px;
-            font-weight: 800;
+            font-weight: 700;
             color: var(--text);
             line-height: 1.2;
         }
@@ -456,26 +430,20 @@
             font-size: 13px;
             color: var(--text-muted);
             margin-top: 4px;
-            font-weight: 500;
         }
 
         /* 卡片 */
         .card {
-            background: rgb(247, 243, 223);
-            border-radius: 20px;
+            background: white;
+            border-radius: var(--radius);
             box-shadow: var(--shadow);
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             overflow: hidden;
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
         }
 
         .card-header {
             padding: 16px 20px;
-            border-bottom: 2px dashed var(--border);
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -483,11 +451,10 @@
 
         .card-header h3 {
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
-            color: var(--text);
         }
 
         .card-header .card-action {
@@ -495,7 +462,6 @@
             color: var(--primary);
             cursor: pointer;
             text-decoration: none;
-            font-weight: 600;
         }
 
         .card-header .card-action:hover {
@@ -551,15 +517,15 @@
         }
 
         .goal-bar {
-            height: 8px;
-            background: #f0ece2;
-            border-radius: 4px;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
             overflow: hidden;
         }
 
         .goal-bar .fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 3px;
             transition: width 0.6s ease;
         }
 
@@ -570,7 +536,7 @@
 
         .goal-percent {
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 600;
             width: 42px;
             text-align: right;
             flex-shrink: 0;
@@ -588,14 +554,14 @@
             padding: 12px 20px;
             gap: 12px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border-bottom: 1px dashed rgba(232, 226, 214, 0.6);
+            transition: background 0.15s;
+            border-bottom: 1px solid #f5f5f5;
         }
 
         .checkin-item:last-child { border-bottom: none; }
 
         .checkin-item:hover {
-            background: rgba(25, 200, 185, 0.08);
+            background: #fafafa;
         }
 
         .checkin-item.completed {
@@ -605,24 +571,18 @@
         .check-box {
             width: 22px;
             height: 22px;
-            border: 2.5px solid #c4b89e;
-            border-radius: 8px;
+            border: 2px solid #d0d0d0;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s;
+            transition: all 0.2s;
             flex-shrink: 0;
-            background: rgb(247, 243, 223);
-        }
-
-        .check-box:hover {
-            border-color: var(--primary);
-            transform: translateY(-1px);
         }
 
         .checkin-item.completed .check-box {
             background: var(--primary);
-            border-color: var(--primary-active);
+            border-color: var(--primary);
             color: white;
             font-size: 12px;
         }
@@ -634,7 +594,6 @@
         .checkin-item .task-name {
             flex: 1;
             font-size: 14px;
-            font-weight: 500;
         }
 
         .checkin-item.completed .task-name {
@@ -647,6 +606,51 @@
             color: var(--text-muted);
         }
 
+        /* 错题分布 */
+        .mistake-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mistake-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mistake-row .subject {
+            width: 40px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .mistake-row .bar-wrap {
+            flex: 1;
+            height: 20px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .mistake-row .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            font-size: 11px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .mistake-row .count {
+            width: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: right;
+        }
+
         /* 留言区 */
         .message-list {
             max-height: 200px;
@@ -655,7 +659,7 @@
 
         .message-item {
             padding: 12px 0;
-            border-bottom: 1px dashed rgba(232, 226, 214, 0.6);
+            border-bottom: 1px solid #f5f5f5;
         }
 
         .message-item:last-child { border-bottom: none; }
@@ -664,7 +668,6 @@
             font-size: 14px;
             color: var(--text);
             line-height: 1.5;
-            font-weight: 500;
         }
 
         .message-item .msg-time {
@@ -677,49 +680,34 @@
             display: flex;
             gap: 8px;
             padding-top: 12px;
-            border-top: 2px dashed var(--border);
+            border-top: 1px solid var(--border);
             margin-top: 8px;
         }
 
         .message-input-wrap input {
             flex: 1;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 50px;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
             font-size: 13px;
-            font-weight: 500;
-            background: #fffbe7;
-            color: var(--text);
+            background: #fafafa;
         }
 
         .message-input-wrap input:focus {
-            outline: 2px solid var(--focus-yellow);
-            outline-offset: 2px;
-            background: #fff;
+            outline: none;
+            border-color: var(--primary);
+            background: white;
         }
 
         .message-input-wrap button {
-            padding: 10px 18px;
+            padding: 10px 16px;
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 50px;
+            border-radius: 8px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            box-shadow: 0 3px 0 0 var(--btn-3d-shadow);
-            transition: all 0.2s;
-        }
-
-        .message-input-wrap button:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 0 0 var(--btn-3d-shadow);
-        }
-
-        .message-input-wrap button:active {
-            transform: translateY(1px);
-            box-shadow: 0 1px 0 0 var(--btn-3d-shadow);
         }
 
         /* 打卡热力图（真实月历模式） */
@@ -734,12 +722,11 @@
             color: var(--text-muted);
             font-size: 12px;
             margin-bottom: 6px;
-            font-weight: 600;
         }
 
         .cal-header .weekend {
-            color: #6fba2c;
-            font-weight: 700;
+            color: var(--accent);
+            font-weight: 600;
         }
 
         .cal-grid {
@@ -750,21 +737,20 @@
 
         .cal-cell {
             aspect-ratio: 1;
-            border-radius: 8px;
-            background: #f0ece2;
+            border-radius: 6px;
+            background: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
+            color: #555;
             position: relative;
             cursor: default;
-            transition: transform 0.15s;
+            transition: transform 0.1s;
         }
 
         .cal-cell:hover {
-            transform: scale(1.1);
+            transform: scale(1.08);
         }
 
         .cal-cell.empty {
@@ -773,18 +759,18 @@
 
         .cal-cell.today {
             box-shadow: inset 0 0 0 2px var(--primary);
-            font-weight: 800;
+            font-weight: 700;
             color: var(--primary);
         }
 
         .cal-cell.weekend {
-            background: #fdf6e3;
+            background: #f7f0ea;
         }
 
-        .cal-cell.level-1 { background: #e6f9f6; }
-        .cal-cell.level-2 { background: #82d5bb; }
-        .cal-cell.level-3 { background: #19c8b9; color: #fff; font-weight: 700; }
-        .cal-cell.level-4 { background: #0a9e92; color: #fff; font-weight: 700; }
+        .cal-cell.level-1 { background: #c8e6c9; }
+        .cal-cell.level-2 { background: #81c784; }
+        .cal-cell.level-3 { background: #4caf50; color: #fff; font-weight: 600; }
+        .cal-cell.level-4 { background: #2e7d32; color: #fff; font-weight: 600; }
 
         .cal-legend {
             display: flex;
@@ -799,14 +785,14 @@
         .cal-legend .legend-dot {
             width: 12px;
             height: 12px;
-            border-radius: 4px;
+            border-radius: 3px;
             display: inline-block;
         }
 
-        .cal-legend .legend-dot.level-1 { background: #e6f9f6; }
-        .cal-legend .legend-dot.level-2 { background: #82d5bb; }
-        .cal-legend .legend-dot.level-3 { background: #19c8b9; }
-        .cal-legend .legend-dot.level-4 { background: #0a9e92; }
+        .cal-legend .legend-dot.level-1 { background: #c8e6c9; }
+        .cal-legend .legend-dot.level-2 { background: #81c784; }
+        .cal-legend .legend-dot.level-3 { background: #4caf50; }
+        .cal-legend .legend-dot.level-4 { background: #2e7d32; }
 
         /* 空状态 */
         .empty-state {
@@ -826,68 +812,55 @@
 
         /* 小按钮 */
         .btn-small {
-            padding: 8px 18px;
+            padding: 8px 16px;
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 50px;
+            border-radius: 8px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 3px 0 0 var(--btn-3d-shadow);
-            letter-spacing: 0.02em;
-        }
-
-        .btn-small:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 0 0 var(--btn-3d-shadow);
-        }
-
-        .btn-small:active {
-            transform: translateY(1px);
-            box-shadow: 0 1px 0 0 var(--btn-3d-shadow);
+            transition: all 0.2s;
         }
 
         .btn-back {
-            padding: 6px 16px;
-            background: #f0ece2;
+            padding: 6px 14px;
+            background: #f0f0f0;
             color: var(--text-secondary);
             border: none;
-            border-radius: 50px;
+            border-radius: 8px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
         }
 
         .btn-back:hover {
-            background: #e4ddd0;
+            background: #e0e0e0;
             color: var(--text);
-            transform: translateY(-1px);
+        }
+
+        .btn-small:hover {
+            background: #3d6a4a;
         }
 
         .btn-small.secondary {
-            background: #f0ece2;
+            background: #f0f0f0;
             color: var(--text);
-            box-shadow: 0 2px 4px 0 rgba(61, 52, 40, 0.06);
         }
 
         .btn-small.secondary:hover {
-            background: #e4ddd0;
-            box-shadow: 0 3px 10px 0 rgba(61, 52, 40, 0.10);
+            background: #e0e0e0;
         }
 
         .btn-small.danger {
             background: var(--danger-light);
             color: var(--danger);
-            box-shadow: none;
         }
 
         .btn-small.danger:hover {
-            background: #fbd5d2;
+            background: #f8d7d0;
         }
 
         /* 打卡清单（家长端） */
@@ -1702,7 +1675,7 @@
                 <div class="nav-item nav-subitem" data-page="settings" onclick="switchPage('settings')">
                     <span class="nav-icon">⚙️</span> 任务配置
                 </div>
-                <div class="nav-item" data-page="mistakes" style="display:none" onclick="switchPage('mistakes')">
+                <div class="nav-item" data-page="mistakes" onclick="switchPage('mistakes')">
                     <span class="nav-icon">📝</span> 错题本
                 </div>
                 <div class="nav-item" data-page="exams" onclick="switchPage('exams')">
@@ -1773,6 +1746,13 @@
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-header">
+                                <div class="kpi-icon blue">📝</div>
+                            </div>
+                            <div class="kpi-value" id="kpiMistakes">0</div>
+                            <div class="kpi-label">本周错题</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
                                 <div class="kpi-icon purple">💬</div>
                             </div>
                             <div class="kpi-value" id="kpiMessages">0</div>
@@ -1820,8 +1800,19 @@
                             </div>
                         </div>
 
-                        <!-- 右栏：留言 -->
+                        <!-- 右栏：错题 + 留言 -->
                         <div style="display:flex;flex-direction:column;gap:20px;">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>📝 错题分布</h3>
+                                    <a class="card-action" onclick="switchPage('mistakes')">全部 →</a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mistake-chart" id="mistakeChart">
+                                        <!-- 动态填充 -->
+                                    </div>
+                                </div>
+                            </div>
                             <div class="card">
                                 <div class="card-header">
                                     <h3>💬 家长留言</h3>
@@ -1868,7 +1859,6 @@
                             <div style="display:flex;align-items:center;gap:10px;">
                                 <input type="date" id="taskConfigDate" value="" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;" onchange="loadTaskConfig()">
                                 <button class="btn-small" onclick="showAddTaskModal()">+ 新增任务</button>
-                                <button class="btn-small secondary" onclick="showHistoryTaskModal()">+ 添加任务</button>
                             </div>
                         </div>
                         <div class="card-body no-padding">
@@ -1879,7 +1869,7 @@
                     </div>
                 </div>
                 <!-- 错题本页 -->
-                <div class="page" id="page-mistakes" style="display:none">
+                <div class="page" id="page-mistakes">
                     <div class="card">
                         <div class="card-header">
                             <h3>📝 错题本</h3>
@@ -1978,17 +1968,6 @@
                         <div class="card-body">
                             <div id="weeklyBonusResult" style="display:none;margin-bottom:16px;"></div>
                             <h4 style="margin-bottom:12px;font-size:14px;color:var(--text-secondary);">积分流水</h4>
-                            
-                            <!-- 自定义积分修改 -->
-                            <div style="background:var(--bg);border-radius:12px;padding:16px;margin-bottom:20px;">
-                                <h4 style="margin-bottom:12px;font-size:14px;color:var(--text);">📝 自定义积分修改</h4>
-                                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                                    <input type="number" id="customPointsInput" placeholder="积分（正数加分，负数减分）" style="flex:1;min-width:150px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
-                                    <input type="text" id="customPointsReason" placeholder="原因说明" style="flex:2;min-width:200px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
-                                    <button class="btn-small" onclick="submitCustomPoints()" style="background:var(--accent);">提交</button>
-                                </div>
-                                <div id="customPointsResult" style="display:none;margin-top:10px;font-size:13px;"></div>
-                            </div>
                             <div id="pointsLedger">
                                 <div class="empty-state"><div class="empty-icon">📋</div><p>加载中...</p></div>
                             </div>
@@ -2016,7 +1995,10 @@
                 <div class="page" id="page-books"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📚</div><p>阅读书单 — 开发中</p></div></div></div></div>
                 <div class="page" id="page-calendar"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><p>学习日历 — 开发中</p></div></div></div></div>
                 <div class="page" id="page-messages"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">💬</div><p>家长留言 — 开发中</p></div></div></div></div>
-                
+            </div>
+        </main>
+    </div>
+
     <!-- 任务编辑模态框 -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal-box">
@@ -2118,22 +2100,6 @@
             </div>
         </div>
     </div>
-    <!-- 历史任务选择模态框（多选批量添加） -->
-    <div class="modal-overlay" id="historyTaskModal">
-        <div class="modal-box">
-            <h3>选择历史任务（可多选）</h3>
-            <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
-                <label style="cursor:pointer;font-size:14px;"><input type="checkbox" id="selectAllTasks" onchange="toggleSelectAll()"> 全选</label>
-                <span id="selectedCount" style="font-size:13px;color:var(--text-secondary);margin-left:auto;">已选 0 个</span>
-            </div>
-            <div id="historyTaskList" style="max-height:400px;overflow-y:auto;margin:8px 0;"></div>
-            <div class="modal-actions">
-                <button class="btn-small secondary" onclick="closeHistoryTaskModal()">取消</button>
-                <button class="btn-small primary" id="batchAddBtn" onclick="batchAddHistoryTasks()" disabled>确认添加（0）</button>
-            </div>
-        </div>
-    </div>
-
 
     <script>
         const API_BASE = '/xuexi/api';
@@ -2808,6 +2774,7 @@
                 const data = await res.json();
                 document.getElementById('kpiRate').textContent = data.today_rate + '%';
                 document.getElementById('kpiStreak').textContent = data.streak + '天';
+                document.getElementById('kpiMistakes').textContent = data.week_mistakes;
                 document.getElementById('kpiMessages').textContent = data.unread_messages;
                 document.getElementById('kpiTrend').textContent = data.today_rate >= 80 ? '↑ 优秀' : data.today_rate >= 50 ? '→ 加油' : '↓ 需努力';
             } catch (e) { console.error(e); }
@@ -2845,6 +2812,28 @@
                         <span class="task-name">${task.name}</span>
                     </div>
                 `).join('');
+            } catch (e) { console.error(e); }
+
+            // 错题分布
+            try {
+                const res = await fetch(`${API_BASE}/mistakes/stats?student_id=${studentId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const container = document.getElementById('mistakeChart');
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>暂无错题记录</p></div>';
+                } else {
+                    const maxCount = Math.max(...data.map(d => d.total));
+                    const barColors = ['#c0392b', '#e67e22', '#3498db', '#27ae60'];
+                    container.innerHTML = data.map((s, i) => `
+                        <div class="mistake-row">
+                            <span class="subject">${s.subject}</span>
+                            <div class="bar-wrap">
+                                <div class="bar-fill" style="width:${(s.total/maxCount)*100}%;background:${barColors[i%4]}">${s.total}</div>
+                            </div>
+                            <span class="count">${s.total}道</span>
+                        </div>
+                    `).join('');
+                }
             } catch (e) { console.error(e); }
 
             // 留言
@@ -3762,208 +3751,6 @@
                 btn.textContent = '添加错题';
             }
         }
-
     </script>
-
-<script>
-async function submitCustomPoints() {
-    const pointsInput = document.getElementById('customPointsInput');
-    const reasonInput = document.getElementById('customPointsReason');
-    const resultDiv = document.getElementById('customPointsResult');
-    
-    const points = parseInt(pointsInput.value);
-    const reason = reasonInput.value.trim();
-    
-    if (isNaN(points) || points === 0) {
-        resultDiv.style.display = 'block';
-        resultDiv.style.color = 'var(--danger)';
-        resultDiv.textContent = '请输入有效的积分数量（不能为0）';
-        return;
-    }
-    
-    if (!reason) {
-        resultDiv.style.display = 'block';
-        resultDiv.style.color = 'var(--danger)';
-        resultDiv.textContent = '请输入原因说明';
-        return;
-    }
-    
-    try {
-        const res = await fetch('/xuexi/api/points/custom', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('xuexi_token')
-            },
-            body: JSON.stringify({
-                student_id: 2, // 小石榴的ID
-                points: points,
-                reason: reason
-            })
-        });
-        
-        const data = await res.json();
-        
-        if (data.success) {
-            resultDiv.style.display = 'block';
-            resultDiv.style.color = 'var(--success)';
-            resultDiv.textContent = '✓ 积分修改成功！';
-            pointsInput.value = '';
-            reasonInput.value = '';
-            loadPointsPage(); // 刷新积分页面
-        } else {
-            resultDiv.style.display = 'block';
-            resultDiv.style.color = 'var(--danger)';
-            resultDiv.textContent = '✗ ' + (data.error || '修改失败');
-        }
-    } catch (e) {
-        resultDiv.style.display = 'block';
-        resultDiv.style.color = 'var(--danger)';
-        resultDiv.textContent = '✗ 提交失败：' + e.message;
-    }
-}
-</script>
-<script>
-
-// 显示历史任务选择弹窗（多选模式）
-async function showHistoryTaskModal() {
-    const date = document.getElementById('taskConfigDate').value;
-    if (!date) {
-        alert('请先选择日期');
-        return;
-    }
-    
-    try {
-        const res = await fetch('/xuexi/api/tasks/history', {
-            headers: { 'Authorization': 'Bearer ' + token }
-        });
-        const tasks = await res.json();
-        
-        // 获取当天已有的任务ID，用于标记已添加的
-        const dateRes = await fetch('/xuexi/api/checkins/' + date + '?student_id=' + studentId, {
-            headers: { 'Authorization': 'Bearer ' + token }
-        });
-        const dateTasks = await dateRes.json();
-        const existingTaskIds = new Set();
-        dateTasks.forEach(t => {
-            existingTaskIds.add(t.id);
-            if (t.sub_tasks) t.sub_tasks.forEach(st => existingTaskIds.add(st.id));
-        });
-        
-        let html = '';
-        tasks.forEach(task => {
-            const isExisting = existingTaskIds.has(task.id);
-            const subCount = (task.sub_tasks && task.sub_tasks.length > 0) ? '<div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">包含 ' + task.sub_tasks.length + ' 个子任务</div>' : '';
-            const disabledAttr = isExisting ? 'disabled' : '';
-            const opacityStyle = isExisting ? 'opacity:0.5;' : '';
-            const existingTag = isExisting ? '<span style="font-size:11px;color:var(--accent);margin-left:6px;">（已添加）</span>' : '';
-            
-            html += '<label style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;' + opacityStyle + '" class="task-checkbox-item">';
-            html += '<input type="checkbox" class="task-checkbox" value="' + task.id + '" data-name="' + task.name.replace(/"/g, '&quot;') + '" onchange="updateSelectedCount()" ' + disabledAttr + ' style="margin-right:10px;width:18px;height:18px;flex-shrink:0;">';
-            html += '<div><div style="font-weight:600;">' + task.icon + ' ' + task.name + existingTag + '</div>';
-            html += subCount;
-            html += '</div></label>';
-        });
-        
-        document.getElementById('historyTaskList').innerHTML = html;
-        document.getElementById('selectAllTasks').checked = false;
-        updateSelectedCount();
-        document.getElementById('historyTaskModal').classList.add('active');
-    } catch (e) {
-        console.error('加载历史任务失败:', e);
-        alert('加载历史任务失败');
-    }
-}
-
-function closeHistoryTaskModal() {
-    document.getElementById('historyTaskModal').classList.remove('active');
-}
-
-// 全选/取消全选
-function toggleSelectAll() {
-    const checked = document.getElementById('selectAllTasks').checked;
-    const checkboxes = document.querySelectorAll('.task-checkbox:not(:disabled)');
-    checkboxes.forEach(cb => { cb.checked = checked; });
-    updateSelectedCount();
-}
-
-// 更新已选数量和按钮状态
-function updateSelectedCount() {
-    const checkboxes = document.querySelectorAll('.task-checkbox:checked');
-    const count = checkboxes.length;
-    document.getElementById('selectedCount').textContent = '已选 ' + count + ' 个';
-    const btn = document.getElementById('batchAddBtn');
-    btn.textContent = '确认添加（' + count + '）';
-    btn.disabled = count === 0;
-    
-    // 同步全选checkbox状态
-    const allEnabled = document.querySelectorAll('.task-checkbox:not(:disabled)');
-    const allChecked = document.querySelectorAll('.task-checkbox:checked');
-    document.getElementById('selectAllTasks').checked = allEnabled.length > 0 && allEnabled.length === allChecked.length;
-}
-
-// 批量添加历史任务到当天打卡清单
-async function batchAddHistoryTasks() {
-    const date = document.getElementById('taskConfigDate').value;
-    if (!date) {
-        alert('请先选择日期');
-        return;
-    }
-    
-    const checkboxes = document.querySelectorAll('.task-checkbox:checked');
-    if (checkboxes.length === 0) return;
-    
-    const taskList = Array.from(checkboxes).map(cb => ({
-        id: parseInt(cb.value),
-        name: cb.dataset.name
-    }));
-    
-    const btn = document.getElementById('batchAddBtn');
-    btn.disabled = true;
-    btn.textContent = '添加中...';
-    
-    let successCount = 0;
-    let failCount = 0;
-    let failNames = [];
-    
-    for (const task of taskList) {
-        try {
-            const res = await fetch('/xuexi/api/checkins/add-task', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
-                body: JSON.stringify({
-                    student_id: studentId,
-                    task_id: task.id,
-                    date: date
-                })
-            });
-            const result = await res.json();
-            if (result.success) {
-                successCount++;
-            } else {
-                failCount++;
-                failNames.push(task.name);
-            }
-        } catch (e) {
-            failCount++;
-            failNames.push(task.name);
-            console.error('添加任务失败:', task.name, e);
-        }
-    }
-    
-    // 显示结果
-    if (failCount === 0) {
-        alert('✓ 成功添加 ' + successCount + ' 个任务到 ' + date + ' 的打卡清单');
-    } else {
-        alert('添加完成：成功 ' + successCount + ' 个，失败 ' + failCount + ' 个\n失败任务：' + failNames.join('、'));
-    }
-    
-    closeHistoryTaskModal();
-    loadTaskConfig();
-}
-</script>
 </body>
 </html>

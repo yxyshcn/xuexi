@@ -4,219 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>小石榴的学习</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-/* 纸娃娃换装系统样式 */
-.dressup-container {
-    padding: 20px;
-}
-
-.character-display {
-    position: relative;
-    width: 300px;
-    height: 400px;
-    margin: 0 auto 30px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-
-.character-base {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2YwZjBmMCIvPjxjaXJjbGUgY3g9IjE1MCIgY3k9IjEwMCIgcj0iNDAiIGZpbGw9IiNmZmQ3ZDciLz48cmVjdCB4PSIxMzAiIHk9IjE0MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2ZmZDdkNyIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iNDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjZmZkN2Q3Ii8+PHJlY3QgeD0iMTYwIiB5PSIyNDAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNmZmQ3ZDciLz48L3N2Zz4=');
-}
-
-.character-outfit {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-
-.outfit-layer {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.outfit-categories {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-}
-
-.category-btn {
-    padding: 10px 20px;
-    border: none;
-    background: #f0f0f0;
-    border-radius: 20px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.3s;
-    font-size: 14px;
-}
-
-.category-btn.active {
-    background: #667eea;
-    color: white;
-}
-
-.outfit-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 20px;
-}
-
-.outfit-item {
-    background: white;
-    border-radius: 15px;
-    padding: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    cursor: pointer;
-    transition: transform 0.3s;
-}
-
-.outfit-item:hover {
-    transform: translateY(-5px);
-}
-
-.outfit-item.owned {
-    border: 3px solid #4CAF50;
-}
-
-.outfit-item.equipped {
-    border: 3px solid #667eea;
-    background: #f0f4ff;
-}
-
-.outfit-preview {
-    width: 100%;
-    height: 150px;
-    background: #f9f9f9;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.outfit-name {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.outfit-category {
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 10px;
-}
-
-.outfit-price {
-    font-size: 14px;
-    color: #ff6b6b;
-    font-weight: bold;
-}
-
-.outfit-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.btn-buy, .btn-equip, .btn-unequip {
-    flex: 1;
-    padding: 8px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s;
-}
-
-.btn-buy {
-    background: #ff6b6b;
-    color: white;
-}
-
-.btn-buy:hover {
-    background: #ff5252;
-}
-
-.btn-equip {
-    background: #4CAF50;
-    color: white;
-}
-
-.btn-equip:hover {
-    background: #45a049;
-}
-
-.btn-unequip {
-    background: #9e9e9e;
-    color: white;
-}
-
-.btn-unequip:hover {
-    background: #757575;
-}
-
-.btn-buy:disabled, .btn-equip:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            /* 动森色板 - Animal Crossing Palette */
-            --bg: #f8f8f0;
-            --card: rgb(247, 243, 223);
-            --border: #e8e2d6;
-            --text: #725d42;
-            --text-secondary: #8a7b66;
-            --text-muted: #9f927d;
-            --primary: #19c8b9;
-            --primary-hover: #3dd4c6;
-            --primary-active: #50b9ab;
-            --primary-light: #e6f9f6;
-            --accent: #f7cd67;
-            --accent-light: #fdf6e3;
-            --danger: #fc736d;
-            --danger-light: #fde8e7;
-            --info: #889df0;
-            --info-light: #e8ecfc;
-            --purple: #b77dee;
-            --purple-light: #f3eafc;
-            --shadow: 0 2px 4px 0 rgba(61, 52, 40, 0.06);
-            --shadow-md: 0 3px 10px 0 rgba(61, 52, 40, 0.10);
-            --radius: 20px;
-            --radius-sm: 16px;
-            --btn-3d-shadow: #bdaea0;
-            --focus-yellow: #ffcc00;
+            --bg: #f5f5f0;
+            --card: #ffffff;
+            --border: #e8e4dc;
+            --text: #2d2d2d;
+            --text-secondary: #6b6b6b;
+            --text-muted: #999999;
+            --primary: #4a7c59;
+            --primary-light: #e8f0eb;
+            --accent: #d4a574;
+            --accent-light: #faf3eb;
+            --danger: #c0392b;
+            --danger-light: #fceae8;
+            --info: #5b8fa8;
+            --info-light: #e8f2f7;
+            --purple: #7c6da0;
+            --purple-light: #f0edf5;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --radius: 14px;
+            --radius-sm: 10px;
         }
 
         body {
-            font-family: Nunito, 'Noto Sans SC', 'Zen Maru Gothic', 'HarmonyOS Sans SC', -apple-system, 'PingFang SC', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             padding-bottom: 88px;
             -webkit-font-smoothing: antialiased;
-            font-weight: 500;
-            letter-spacing: 0.01em;
         }
 
         /* ========== 登录页 ========== */
@@ -227,7 +47,7 @@
             justify-content: center;
             min-height: 100vh;
             padding: 24px;
-            background: linear-gradient(160deg, #e6f9f6 0%, #fdf6e3 50%, #f8f8f0 100%);
+            background: linear-gradient(160deg, #e8f0eb 0%, #faf3eb 50%, #f5f0e8 100%);
         }
 
         .login-mascot {
@@ -242,19 +62,18 @@
         }
 
         .login-card {
-            background: rgb(247, 243, 223);
-            border-radius: 24px;
+            background: white;
+            border-radius: 20px;
             padding: 36px 28px;
             width: 100%;
             max-width: 340px;
-            box-shadow: 0 8px 24px rgba(114, 93, 66, 0.15);
-            border: 2px solid var(--border);
+            box-shadow: var(--shadow-md);
             text-align: center;
         }
 
         .login-card h1 {
             font-size: 22px;
-            font-weight: 700;
+            font-weight: 600;
             color: var(--text);
             margin-bottom: 4px;
         }
@@ -273,27 +92,26 @@
         .login-card label {
             display: block;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             color: var(--text-secondary);
             margin-bottom: 6px;
         }
 
         .login-card input {
             width: 100%;
-            padding: 12px 18px;
-            border: none;
-            border-radius: 50px;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
             font-size: 15px;
-            font-weight: 500;
-            background: #fffbe7;
-            color: var(--text);
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #fafafa;
+            transition: all 0.2s;
         }
 
         .login-card input:focus {
-            outline: 2px solid var(--focus-yellow);
-            outline-offset: 2px;
-            background: #fff;
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
         }
 
         .btn-login {
@@ -302,25 +120,16 @@
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 50px;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 8px;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 5px 0 0 var(--btn-3d-shadow);
-            letter-spacing: 0.02em;
-        }
-
-        .btn-login:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 0 0 var(--btn-3d-shadow);
+            transition: all 0.2s;
         }
 
         .btn-login:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 0 var(--btn-3d-shadow);
+            transform: scale(0.98);
         }
 
         .login-error {
@@ -337,8 +146,8 @@
         /* 顶部问候 */
         .header {
             padding: 24px 20px 16px;
-            background: rgb(247, 243, 223);
-            border-bottom: 2px solid var(--border);
+            background: white;
+            border-bottom: 1px solid var(--border);
         }
 
         .header-top {
@@ -355,160 +164,19 @@
         }
 
         .header-avatar {
-            width: 60px;
-            height: 60px;
-            background: var(--accent);
+            width: 40px;
+            height: 40px;
+            background: var(--primary-light);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            cursor: pointer;
-            overflow: hidden;
-            border: 2px solid var(--border);
-            transition: transform 0.2s;
-        }
-
-        .header-avatar:hover {
-            transform: scale(1.1);
-        }
-
-        .header-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* 头像库页面 */
-        .avatar-gallery {
-            padding: 16px 20px;
-        }
-
-        .avatar-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .avatar-tab {
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            background: #f0ece2;
-            color: var(--text-secondary);
-            border: none;
-            transition: all 0.2s;
-        }
-
-        .avatar-tab.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 3px 0 0 var(--btn-3d-shadow);
-        }
-
-        .avatar-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        .avatar-item {
-            background: rgb(247, 243, 223);
-            border-radius: 16px;
-            border: 2px solid var(--border);
-            padding: 12px;
-            text-align: center;
-            position: relative;
-            transition: all 0.2s;
-        }
-
-        .avatar-item:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .avatar-item .avatar-img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin: 0 auto 8px;
-            overflow: hidden;
-            border: 2px solid var(--border);
-            background: #f0ece2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-        }
-
-        .avatar-item .avatar-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .avatar-item .avatar-name {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 4px;
-        }
-
-        .avatar-item .avatar-price {
-            font-size: 11px;
-            color: var(--accent);
-            font-weight: 700;
-        }
-
-        .avatar-item .avatar-btn {
-            margin-top: 6px;
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-size: 11px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .avatar-btn.buy {
-            background: var(--accent);
-            color: #725d42;
-            box-shadow: 0 2px 0 0 var(--btn-3d-shadow);
-        }
-
-        .avatar-btn.use {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 2px 0 0 var(--btn-3d-shadow);
-        }
-
-        .avatar-btn.using {
-            background: var(--primary-light);
-            color: var(--primary);
-            cursor: default;
-            box-shadow: none;
-        }
-
-        .avatar-btn.locked {
-            background: #f0ece2;
-            color: var(--text-muted);
-            cursor: not-allowed;
-        }
-
-        .avatar-badge {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            font-size: 14px;
         }
 
         .date-display {
             font-size: 14px;
             color: var(--text-muted);
-            font-weight: 500;
         }
 
         /* KPI 卡片 */
@@ -520,25 +188,20 @@
         }
 
         .kpi-card {
-            background: rgb(247, 243, 223);
-            border-radius: 20px;
+            background: white;
+            border-radius: var(--radius);
             padding: 16px;
             box-shadow: var(--shadow);
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 12px;
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-2px);
         }
 
         .kpi-icon {
             width: 44px;
             height: 44px;
-            border-radius: 14px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -553,7 +216,7 @@
 
         .kpi-info .kpi-value {
             font-size: 22px;
-            font-weight: 800;
+            font-weight: 700;
             color: var(--text);
             line-height: 1.2;
         }
@@ -561,7 +224,6 @@
         .kpi-info .kpi-label {
             font-size: 12px;
             color: var(--text-muted);
-            font-weight: 500;
         }
 
         /* 区域标题 */
@@ -579,7 +241,7 @@
 
         .section-title {
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 600;
             color: var(--text);
         }
 
@@ -587,7 +249,6 @@
             font-size: 13px;
             color: var(--primary);
             cursor: pointer;
-            font-weight: 600;
         }
 
         /* 任务卡片 */
@@ -601,18 +262,13 @@
             display: flex;
             align-items: center;
             padding: 14px 16px;
-            background: rgb(247, 243, 223);
-            border-radius: 16px;
+            background: white;
+            border-radius: var(--radius-sm);
             box-shadow: var(--shadow);
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             gap: 12px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .task-item:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
+            transition: all 0.15s;
         }
 
         .task-item:active {
@@ -621,32 +277,26 @@
 
         .task-item.completed {
             background: var(--primary-light);
-            border-color: var(--primary-active);
+            border-color: #b8d4c0;
         }
 
         .task-checkbox {
             width: 26px;
             height: 26px;
-            border: 2.5px solid #c4b89e;
+            border: 2.5px solid #d0d0d0;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
             color: white;
-            transition: all 0.15s;
+            transition: all 0.2s;
             flex-shrink: 0;
-            background: var(--card);
-        }
-
-        .task-checkbox:hover {
-            border-color: var(--primary);
-            transform: translateY(-1px);
         }
 
         .task-item.completed .task-checkbox {
             background: var(--primary);
-            border-color: var(--primary-active);
+            border-color: var(--primary);
         }
 
         .task-icon {
@@ -667,9 +317,9 @@
 
         .task-status {
             font-size: 12px;
-            padding: 3px 10px;
-            border-radius: 50px;
-            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 500;
         }
 
         .task-status.done {
@@ -678,7 +328,7 @@
         }
 
         .task-status.pending {
-            background: #f0ece2;
+            background: #f5f5f5;
             color: var(--text-muted);
         }
 
@@ -696,17 +346,12 @@
             flex-direction: column;
             align-items: center;
             padding: 14px 8px;
-            background: rgb(247, 243, 223);
-            border-radius: 16px;
+            background: white;
+            border-radius: var(--radius-sm);
             box-shadow: var(--shadow);
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            transition: all 0.15s;
         }
 
         .action-btn:active {
@@ -716,7 +361,7 @@
         .action-btn .action-icon {
             width: 36px;
             height: 36px;
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -732,22 +377,22 @@
         .action-btn .action-text {
             font-size: 12px;
             color: var(--text-secondary);
-            font-weight: 600;
+            font-weight: 500;
         }
 
         /* 留言卡片 */
         .message-card {
             margin: 0 20px 16px;
-            background: linear-gradient(135deg, var(--accent-light), rgb(247, 243, 223));
-            border-radius: 20px;
+            background: linear-gradient(135deg, var(--accent-light), #fff);
+            border-radius: var(--radius);
             padding: 16px;
-            border: 2px solid #f0e0c0;
+            border: 1px solid #f0e0d0;
         }
 
         .message-card .msg-from {
             font-size: 12px;
             color: var(--accent);
-            font-weight: 700;
+            font-weight: 600;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
@@ -758,7 +403,6 @@
             font-size: 15px;
             color: var(--text);
             line-height: 1.6;
-            font-weight: 500;
         }
 
         .message-card .msg-time {
@@ -773,12 +417,12 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgb(247, 243, 223);
+            background: white;
             display: flex;
             justify-content: space-around;
             padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-            border-top: 2px solid var(--border);
-            box-shadow: 0 -2px 8px rgba(114, 93, 66, 0.08);
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
             z-index: 100;
         }
 
@@ -799,12 +443,12 @@
         .nav-item .nav-label {
             font-size: 11px;
             color: var(--text-muted);
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .nav-item.active .nav-label {
             color: var(--primary);
-            font-weight: 700;
+            font-weight: 600;
         }
 
         .nav-item.active::after {
@@ -895,31 +539,22 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 8px 18px;
-            border-radius: 50px;
+            padding: 8px 16px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 3px 0 0 var(--btn-3d-shadow);
+            transition: all 0.2s;
             white-space: nowrap;
         }
 
         .reward-btn:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 0 0 var(--btn-3d-shadow);
-        }
-
-        .reward-btn:active {
-            transform: translateY(1px);
-            box-shadow: 0 1px 0 0 var(--btn-3d-shadow);
+            background: #3d6a4a;
         }
 
         .reward-btn:disabled {
-            background: #d4c9b4;
+            background: #ccc;
             cursor: not-allowed;
-            box-shadow: none;
         }
 
         .redemption-item {
@@ -966,11 +601,11 @@
         }
 
         .form-card {
-            background: rgb(247, 243, 223);
-            border-radius: 20px;
+            background: white;
+            border-radius: var(--radius);
             padding: 20px;
             box-shadow: var(--shadow);
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             margin-bottom: 16px;
         }
 
@@ -994,29 +629,26 @@
         .form-card input,
         .form-card textarea {
             width: 100%;
-            padding: 12px 18px;
-            border: none;
-            border-radius: 50px;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
             font-size: 15px;
-            font-weight: 500;
-            background: #fffbe7;
-            color: var(--text);
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #fafafa;
+            transition: all 0.2s;
         }
 
         .form-card textarea {
             height: 80px;
             resize: none;
             font-family: inherit;
-            border-radius: 16px;
         }
 
         .form-card select:focus,
         .form-card input:focus,
         .form-card textarea:focus {
-            outline: 2px solid var(--focus-yellow);
-            outline-offset: 2px;
-            background: #fff;
+            outline: none;
+            border-color: var(--primary);
+            background: white;
         }
 
         .btn-submit {
@@ -1025,39 +657,25 @@
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 50px;
+            border-radius: 10px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 5px 0 0 var(--btn-3d-shadow);
-            letter-spacing: 0.02em;
-        }
-
-        .btn-submit:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 0 0 var(--btn-3d-shadow);
+            transition: all 0.15s;
         }
 
         .btn-submit:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 0 var(--btn-3d-shadow);
+            transform: scale(0.98);
         }
 
         /* 进度页 */
         .progress-card {
-            background: rgb(247, 243, 223);
-            border-radius: 20px;
+            background: white;
+            border-radius: var(--radius);
             padding: 16px;
             margin: 0 20px 12px;
             box-shadow: var(--shadow);
-            border: 2px solid var(--border);
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .progress-card:hover {
-            transform: translateY(-2px);
+            border: 1px solid var(--border);
         }
 
         .progress-card .subject-row {
@@ -1073,7 +691,7 @@
 
         .progress-card .subject-name {
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 600;
             flex: 1;
         }
 
@@ -1085,7 +703,7 @@
 
         .progress-bar {
             height: 8px;
-            background: #f0ece2;
+            background: #f0f0f0;
             border-radius: 4px;
             overflow: hidden;
         }
@@ -1093,7 +711,7 @@
         .progress-bar .fill {
             height: 100%;
             border-radius: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--primary-active));
+            background: linear-gradient(90deg, var(--primary), #6ba37a);
             transition: width 0.5s ease;
         }
 
@@ -1103,7 +721,6 @@
             margin-top: 8px;
             font-size: 12px;
             color: var(--text-muted);
-            font-weight: 500;
         }
 
         /* 阅读页 */
@@ -1111,17 +728,12 @@
             display: flex;
             align-items: center;
             padding: 14px 16px;
-            background: rgb(247, 243, 223);
-            border-radius: 16px;
+            background: white;
+            border-radius: var(--radius-sm);
             box-shadow: var(--shadow);
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             margin: 0 20px 8px;
             gap: 12px;
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .book-item:hover {
-            transform: translateY(-2px);
         }
 
         .book-item .book-icon {
@@ -1134,30 +746,29 @@
 
         .book-item .book-title {
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 600;
         }
 
         .book-item .book-pages {
             font-size: 12px;
             color: var(--text-muted);
-            font-weight: 500;
         }
 
         .book-item .book-status {
             font-size: 11px;
-            padding: 3px 10px;
-            border-radius: 50px;
+            padding: 3px 8px;
+            border-radius: 12px;
             background: var(--primary-light);
             color: var(--primary);
-            font-weight: 600;
+            font-weight: 500;
         }
 
         /* 任务分组 */
         .task-group {
-            background: rgb(247, 243, 223);
-            border-radius: 16px;
+            background: white;
+            border-radius: var(--radius-sm);
             box-shadow: var(--shadow);
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             overflow: hidden;
             margin-bottom: 8px;
         }
@@ -1168,7 +779,7 @@
             padding: 14px 16px;
             background: var(--primary-light);
             gap: 12px;
-            border-bottom: 2px dashed var(--border);
+            border-bottom: 1px solid #d8e8dc;
         }
 
         .task-group-header .task-icon {
@@ -1184,11 +795,11 @@
 
         .task-group-count {
             font-size: 13px;
-            font-weight: 700;
+            font-weight: 600;
             color: var(--primary);
             padding: 3px 10px;
             background: white;
-            border-radius: 50px;
+            border-radius: 12px;
         }
 
         .task-group-body {
@@ -1201,7 +812,7 @@
         .task-group-body .task-item {
             margin: 0;
             box-shadow: none;
-            border: 1px dashed var(--border);
+            border: 1px solid #f0f0f0;
             padding: 12px 14px;
         }
 
@@ -1355,10 +966,7 @@
             <div class="header">
                 <div class="header-top">
                     <div class="greeting" id="greeting">你好，小石榴！</div>
-                    <div class="header-avatar" onclick="switchPage('avatar')">
-                        <img id="currentAvatar" src="" alt="头像" style="display:none;">
-                        <span id="defaultAvatarIcon">🌸</span>
-                    </div>
+                    <div class="header-avatar">🌸</div>
                 </div>
                 <div class="date-display" id="dateDisplay"></div>
             </div>
@@ -1385,7 +993,13 @@
                         <div class="kpi-label">本周打卡</div>
                     </div>
                 </div>
-
+                <div class="kpi-card">
+                    <div class="kpi-icon purple">📝</div>
+                    <div class="kpi-info">
+                        <div class="kpi-value" id="kpiMistakes">0</div>
+                        <div class="kpi-label">本周错题</div>
+                    </div>
+                </div>
             </div>
 
             <div class="section">
@@ -1422,6 +1036,7 @@
                     <div class="form-group">
                         <label>类型</label>
                         <select id="submitType">
+                            <option value="mistake">📝 错题</option>
                             <option value="homework">📄 作业</option>
                         </select>
                     </div>
@@ -1495,7 +1110,13 @@
                         <div class="kpi-label">本周打卡</div>
                     </div>
                 </div>
-
+                <div class="kpi-card">
+                    <div class="kpi-icon blue">📝</div>
+                    <div class="kpi-info">
+                        <div class="kpi-value" id="totalMistakes">0</div>
+                        <div class="kpi-label">本周错题</div>
+                    </div>
+                </div>
             </div>
 
             <div class="section">
@@ -1504,27 +1125,6 @@
                 </div>
             </div>
             <div id="subjectProgress"></div>
-        </div>
-
-        <!-- 头像库页面 -->
-        <div class="page" id="page-avatar">
-            <div class="header">
-                <div class="header-top">
-                    <div class="greeting">🎨 我的头像</div>
-                    <div class="header-avatar" onclick="switchPage('today')">
-                        <img id="currentAvatar2" src="" alt="头像" style="display:none;">
-                        <span id="defaultAvatarIcon2">🌸</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="avatar-gallery">
-                <div class="avatar-tabs">
-                    <button class="avatar-tab active" onclick="switchAvatarTab('all')">全部</button>
-                    <button class="avatar-tab" onclick="switchAvatarTab('owned')">我的</button>
-                </div>
-                <div class="avatar-grid" id="avatarGrid"></div>
-            </div>
         </div>
 
         <!-- 积分兑换页 -->
@@ -1556,36 +1156,6 @@
             </div>
             <div id="redemptionHistory"></div>
         </div>
-        <div class="page" id="page-dressup">
-            <div class="header">
-                <div class="header-top">
-                    <div class="greeting">👗 纸娃娃换装</div>
-                    <div class="header-avatar">⭐</div>
-                </div>
-            </div>
-
-            <div class="dressup-container">
-                <!-- 角色展示区 -->
-                <div class="character-display">
-                    <div class="character-base"></div>
-                    <div class="character-outfit" id="characterOutfit"></div>
-                </div>
-
-                <!-- 服装分类标签 -->
-                <div class="outfit-categories">
-                    <button class="category-btn active" data-category="all">全部</button>
-                    <button class="category-btn" data-category="hair">头发</button>
-                    <button class="category-btn" data-category="top">上衣</button>
-                    <button class="category-btn" data-category="bottom">下装</button>
-                    <button class="category-btn" data-category="shoes">鞋子</button>
-                    <button class="category-btn" data-category="hat">帽子</button>
-                    <button class="category-btn" data-category="accessory">配饰</button>
-                </div>
-
-                <!-- 服装列表 -->
-                <div class="outfit-list" id="outfitList"></div>
-            </div>
-        </div>
 
         <!-- 底部导航 -->
         <div class="bottom-nav">
@@ -1593,13 +1163,9 @@
                 <span class="nav-icon">📋</span>
                 <span class="nav-label">今日</span>
             </div>
-            <div class="nav-item" data-page="avatar" onclick="switchPage('avatar')">
-                <span class="nav-icon">🎨</span>
-                <span class="nav-label">头像</span>
-            </div>
-            <div class="nav-item" data-page="dressup" onclick="switchPage('dressup')">
-                <span class="nav-icon">👗</span>
-                <span class="nav-label">换装</span>
+            <div class="nav-item" data-page="submit" onclick="switchPage('submit')">
+                <span class="nav-icon">📸</span>
+                <span class="nav-label">提交</span>
             </div>
             <div class="nav-item" data-page="points" onclick="switchPage('points')">
                 <span class="nav-icon">🏆</span>
@@ -1609,9 +1175,12 @@
                 <span class="nav-icon">📊</span>
                 <span class="nav-label">进度</span>
             </div>
+            <div class="nav-item" onclick="doLogout()">
+                <span class="nav-icon">🚪</span>
+                <span class="nav-label">退出</span>
+            </div>
         </div>
     </div>
-</div>
 
     <!-- 作业提交模态框 -->
     <div class="modal-overlay" id="submitModal">
@@ -1632,204 +1201,13 @@
     </div>
 
     <script>
-
-// 纸娃娃换装系统
-let allOutfits = [];
-let ownedOutfits = [];
-let currentOutfit = {};
-let currentCategory = 'all';
-
-// 加载换装页面
-async function loadDressupPage() {
-    await Promise.all([
-        loadAllOutfits(),
-        loadOwnedOutfits(),
-        loadCurrentOutfit()
-    ]);
-    renderOutfitList();
-    renderCharacter();
-}
-
-// 加载所有服装
-async function loadAllOutfits() {
-    const res = await fetch('/xuexi/api/outfits', {
-        headers: { 'Authorization': 'Bearer ' + token }
-    });
-    allOutfits = await res.json();
-}
-
-// 加载已拥有的服装
-async function loadOwnedOutfits() {
-    const res = await fetch('/xuexi/api/outfits/mine', {
-        headers: { 'Authorization': 'Bearer ' + token }
-    });
-    ownedOutfits = await res.json();
-}
-
-// 加载当前装扮
-async function loadCurrentOutfit() {
-    const res = await fetch('/xuexi/api/students/outfit', {
-        headers: { 'Authorization': 'Bearer ' + token }
-    });
-    currentOutfit = await res.json();
-}
-
-// 渲染服装列表
-function renderOutfitList() {
-    const list = document.getElementById('outfitList');
-    let filtered = currentCategory === 'all' 
-        ? allOutfits 
-        : allOutfits.filter(o => o.category === currentCategory);
-    
-    list.innerHTML = filtered.map(outfit => {
-        const owned = ownedOutfits.some(o => o.id === outfit.id);
-        const equipped = currentOutfit[outfit.category] === outfit.id;
-        
-        let actions = '';
-        if (!owned) {
-            actions = '<button class="btn-buy" onclick="buyOutfit(' + outfit.id + ')">购买 ' + outfit.price + '金币</button>';
-        } else if (equipped) {
-            actions = '<button class="btn-unequip" onclick="unequipOutfit(\'' + outfit.category + '\')">卸下</button>';
-        } else {
-            actions = '<button class="btn-equip" onclick="equipOutfit(' + outfit.id + ', \'' + outfit.category + '\')">装备</button>';
-        }
-        
-        return '<div class="outfit-item ' + (owned ? 'owned' : '') + ' ' + (equipped ? 'equipped' : '') + '">' +
-            '<div class="outfit-preview" style="background-color: ' + getOutfitColor(outfit.category) + '; background-image: url(' + outfit.image_url + ');"></div>' +
-            '<div class="outfit-name">' + outfit.name + '</div>' +
-            '<div class="outfit-category">' + getCategoryName(outfit.category) + '</div>' +
-            (owned ? '<div class="outfit-price">已拥有</div>' : '<div class="outfit-price">' + outfit.price + ' 金币</div>') +
-            '<div class="outfit-actions">' + actions + '</div>' +
-            '</div>';
-    }).join('');
-}
-
-// 获取分类中文名
-function getCategoryName(category) {
-    const names = {
-        'hair': '头发',
-        'top': '上衣',
-        'bottom': '下装',
-        'shoes': '鞋子',
-        'hat': '帽子',
-        'accessory': '配饰'
-    };
-    return names[category] || category;
-}
-
-// 获取服装颜色（用于预览）
-function getOutfitColor(category) {
-    const colors = {
-        'hair': '#FFB6C1',
-        'top': '#87CEEB',
-        'bottom': '#98D8C8',
-        'shoes': '#DDA0DD',
-        'hat': '#F0E68C',
-        'accessory': '#DDA0DD'
-    };
-    return colors[category] || '#f0f0f0';
-}
-
-// 购买服装
-async function buyOutfit(outfitId) {
-    const res = await fetch('/xuexi/api/outfits/' + outfitId + '/purchase', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify({ student_id: currentUser.id })
-    });
-    
-    const result = await res.json();
-    if (result.success) {
-        alert('购买成功！');
-        await loadOwnedOutfits();
-        await loadPointsPage();
-        renderOutfitList();
-    } else {
-        alert('购买失败：' + result.error);
-    }
-}
-
-// 装备服装
-async function equipOutfit(outfitId, category) {
-    currentOutfit[category] = outfitId;
-    
-    const res = await fetch('/xuexi/api/students/outfit', {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify({
-            student_id: currentUser.id,
-            ...currentOutfit
-        })
-    });
-    
-    const result = await res.json();
-    if (result.success) {
-        renderOutfitList();
-        renderCharacter();
-    }
-}
-
-// 卸下服装
-async function unequipOutfit(category) {
-    currentOutfit[category] = null;
-    
-    const res = await fetch('/xuexi/api/students/outfit', {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify({
-            student_id: currentUser.id,
-            ...currentOutfit
-        })
-    });
-    
-    const result = await res.json();
-    if (result.success) {
-        renderOutfitList();
-        renderCharacter();
-    }
-}
-
-// 渲染角色
-function renderCharacter() {
-    const outfitContainer = document.getElementById('characterOutfit');
-    let layers = '';
-    
-    // 按z_index排序
-    const equippedItems = Object.entries(currentOutfit)
-        .filter(([category, id]) => id !== null)
-        .map(([category, id]) => {
-            const outfit = allOutfits.find(o => o.id === id);
-            return outfit;
-        })
-        .filter(o => o)
-        .sort((a, b) => a.z_index - b.z_index);
-    
-    equippedItems.forEach(outfit => {
-        layers += '<div class="outfit-layer" style="background-image: url(' + outfit.image_url + '); background-color: ' + getOutfitColor(outfit.category) + '; opacity: 0.9;"></div>';
-    });
-    
-    outfitContainer.innerHTML = layers;
-}
-
-// 分类切换
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('category-btn')) {
-        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.add('active');
-        currentCategory = e.target.dataset.category;
-        renderOutfitList();
-    }
-});
         const API_BASE = '/xuexi/api';
+        function getLocalDate(d = new Date()) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
         let token = localStorage.getItem('xuexi_student_token');
         let currentUser = JSON.parse(localStorage.getItem('xuexi_student_user') || 'null');
 
@@ -1873,7 +1251,6 @@ document.addEventListener('click', function(e) {
             const now = new Date();
             document.getElementById('dateDisplay').textContent = now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
             loadTodayTasks();
-            loadCurrentAvatar();
             loadMessages();
         }
 
@@ -1921,7 +1298,7 @@ document.addEventListener('click', function(e) {
             const fd = new FormData();
             fd.append('image', fileInput.files[0]);
             fd.append('task_id', submitTaskId);
-            fd.append('date', new Date().toISOString().split('T')[0]);
+            fd.append('date', getLocalDate());
             try {
                 const res = await fetch(`${API_BASE}/submissions`, {
                     method: 'POST',
@@ -1935,7 +1312,6 @@ document.addEventListener('click', function(e) {
                 }
                 showSubmitResult(data);
                 loadTodayTasks(); // 刷新今日任务显示已提交状态
-            loadCurrentAvatar();
             } catch (e) {
                 alert('提交失败：网络错误，请检查网络后重试');
                 console.error(e);
@@ -1984,18 +1360,15 @@ document.addEventListener('click', function(e) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`page-${page}`).classList.add('active');
-            const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
-            if (navItem) navItem.classList.add('active');
+            document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
             if (page === 'progress') loadProgress();
             if (page === 'reading') loadBooks();
             if (page === 'points') loadPointsPage();
-            if (page === 'avatar') loadAvatarGallery();
-            if (page === 'dressup') loadDressupPage();
         }
 
         async function loadTodayTasks() {
             try {
-                const today = new Date().toISOString().split('T')[0];
+                const today = getLocalDate();
                 const [taskRes, subRes] = await Promise.all([
                     fetch(`${API_BASE}/checkins/today`, { headers: { 'Authorization': `Bearer ${token}` } }),
                     fetch(`${API_BASE}/submissions?date=${today}`, { headers: { 'Authorization': `Bearer ${token}` } })
@@ -2085,6 +1458,7 @@ document.addEventListener('click', function(e) {
                 const res = await fetch(`${API_BASE}/stats/dashboard`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await res.json();
                 document.getElementById('kpiStreak').textContent = data.streak + '天';
+                document.getElementById('kpiMistakes').textContent = data.week_mistakes;
             } catch (e) { console.error(e); }
 
             try {
@@ -2096,7 +1470,7 @@ document.addEventListener('click', function(e) {
         }
 
         async function toggleTask(taskId, completed) {
-            const today = new Date().toISOString().split('T')[0];
+            const today = getLocalDate();
             try {
                 await fetch(`${API_BASE}/checkins`, {
                     method: 'POST',
@@ -2104,7 +1478,6 @@ document.addEventListener('click', function(e) {
                     body: JSON.stringify({ task_id: taskId, date: today, is_completed: completed })
                 });
                 loadTodayTasks();
-            loadCurrentAvatar();
             } catch (e) { console.error(e); }
         }
 
@@ -2133,7 +1506,7 @@ document.addEventListener('click', function(e) {
             const formData = new FormData();
             formData.append('subject', subject);
             formData.append('description', content);
-            formData.append('topic', '作业');
+            formData.append('topic', type === 'mistake' ? '错题' : '作业');
             if (imageFile) formData.append('image', imageFile);
             try {
                 await fetch(`${API_BASE}/mistakes`, {
@@ -2192,6 +1565,12 @@ document.addEventListener('click', function(e) {
                 const data = await res.json();
                 const total = data.stats.reduce((sum, d) => sum + d.completed, 0);
                 document.getElementById('totalCheckins').textContent = total;
+            } catch (e) { console.error(e); }
+            try {
+                const res = await fetch(`${API_BASE}/mistakes/stats`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const total = data.reduce((sum, s) => sum + s.total, 0);
+                document.getElementById('totalMistakes').textContent = total;
             } catch (e) { console.error(e); }
             try {
                 const res = await fetch(`${API_BASE}/stats/subjects`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -2310,178 +1689,9 @@ document.addEventListener('click', function(e) {
                 }
             } catch (e) {
                 console.error(e);
-                alert('兑换失败，请稍后重试');
+                alert('兑换失败：网络错误');
             }
         }
-
-        // ============ 头像功能 ============
-        let allAvatars = [];
-        let ownedAvatars = [];
-        let currentAvatarId = null;
-        let avatarTab = 'all';
-
-        async function loadDashboard() {
-            try {
-                const res = await fetch(`${API_BASE}/stats/dashboard`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                
-                document.getElementById('kpiStreak').textContent = data.streak + '天';
-                document.getElementById('kpiWeekCheckins').textContent = data.week_checkins;
-                document.getElementById('kpiPoints').textContent = data.points;
-                
-                // 加载当前头像
-                loadCurrentAvatar();
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        async function loadCurrentAvatar() {
-            try {
-                const res = await fetch(`${API_BASE}/students/avatar`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const avatar = await res.json();
-                
-                if (avatar && avatar.image_url) {
-                    document.getElementById("currentAvatar").src = avatar.image_url;
-                    const ca2 = document.getElementById("currentAvatar2");
-                    if (ca2) { ca2.src = avatar.image_url; ca2.style.display = "block"; }
-                    document.getElementById('currentAvatar').style.display = 'block';
-                    document.getElementById('defaultAvatarIcon').style.display = 'none';
-const dai2 = document.getElementById('defaultAvatarIcon2');                    if (dai2) { dai2.style.display = 'none'; }
-                    currentAvatarId = avatar.id;
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-async function loadAvatarGallery() {
-            try {
-                // 先确保加载了当前头像
-                await loadCurrentAvatar();
-                // 加载所有头像和已拥有的头像
-                const [allRes, ownedRes] = await Promise.all([
-                    fetch(`${API_BASE}/avatars`),
-                    fetch(`${API_BASE}/avatars/mine`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    })
-                ]);
-                allAvatars = await allRes.json();
-                ownedAvatars = await ownedRes.json();
-                renderAvatarGrid();
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        function switchAvatarTab(tab) {
-            avatarTab = tab;
-            document.querySelectorAll('.avatar-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            renderAvatarGrid();
-        }
-
-        function renderAvatarGrid() {
-            const grid = document.getElementById('avatarGrid');
-            const avatars = avatarTab === 'owned' ? ownedAvatars : allAvatars;
-            
-            if (avatars.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">暂无头像</div>';
-                return;
-            }
-            
-            grid.innerHTML = avatars.map(avatar => {
-                const isOwned = ownedAvatars.some(a => a.id === avatar.id);
-                const isUsing = currentAvatarId === avatar.id;
-                
-                let btnHtml = '';
-                if (isUsing) {
-                    btnHtml = '<button class="avatar-btn using" disabled>使用中</button>';
-                } else if (isOwned) {
-                    btnHtml = `<button class="avatar-btn use" onclick="useAvatar(${avatar.id})">使用</button>`;
-                } else {
-                    btnHtml = `<button class="avatar-btn buy" onclick="buyAvatar(${avatar.id}, ${avatar.price})">购买 ${avatar.price}分</button>`;
-                }
-                
-                const badge = isUsing ? '<div class="avatar-badge">⭐</div>' : '';
-                
-                return `
-                    <div class="avatar-item">
-                        ${badge}
-                        <div class="avatar-img">
-                            <img src="${avatar.image_url}" alt="${avatar.name}">
-                        </div>
-                        <div class="avatar-name">${avatar.name}</div>
-                        ${btnHtml}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function buyAvatar(avatarId, price) {
-            const points = parseInt(document.getElementById('kpiPoints').textContent);
-            if (points < price) {
-                alert(`积分不足！需要 ${price} 分，当前只有 ${points} 分`);
-                return;
-            }
-            
-            if (!confirm(`确定要购买这个头像吗？\n价格：${price} 积分`)) return;
-            
-            try {
-                const res = await fetch(`${API_BASE}/avatars/${avatarId}/purchase`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    alert('🎉 购买成功！');
-                    document.getElementById('kpiPoints').textContent = data.new_balance;
-                    loadAvatarGallery();
-                } else {
-                    alert(data.error || '购买失败');
-                }
-            } catch (e) {
-                console.error(e);
-                alert('购买失败，请稍后重试');
-            }
-        }
-
-        async function useAvatar(avatarId) {
-            try {
-                const res = await fetch(`${API_BASE}/students/avatar`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ avatar_id: avatarId })
-                });
-                
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    alert('✅ 头像已更换！');
-                    currentAvatarId = avatarId;
-                    loadCurrentAvatar();
-                    renderAvatarGrid();
-                } else {
-                    alert(data.error || '更换失败');
-                }
-            } catch (e) {
-                console.error(e);
-                alert('更换失败，请稍后重试');
-            }
-        }
-
-        // 初始化加载
-        loadDashboard();
     </script>
 </body>
 </html>

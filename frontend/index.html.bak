@@ -1714,6 +1714,9 @@
                 <div class="nav-item" data-page="rewards" onclick="switchPage('rewards')">
                     <span class="nav-icon">🎁</span> 奖励配置
                 </div>
+                <div class="nav-item" data-page="avatars" onclick="switchPage('avatars')">
+                    <span class="nav-icon">🎨</span> 头像管理
+                </div>
                 <div class="nav-section-title">更多</div>
                 <div class="nav-item" data-page="review" onclick="switchPage('review')">
                     <span class="nav-icon">📈</span> 周报复盘
@@ -1868,7 +1871,6 @@
                             <div style="display:flex;align-items:center;gap:10px;">
                                 <input type="date" id="taskConfigDate" value="" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;" onchange="loadTaskConfig()">
                                 <button class="btn-small" onclick="showAddTaskModal()">+ 新增任务</button>
-                                <button class="btn-small secondary" onclick="showHistoryTaskModal()">+ 添加任务</button>
                             </div>
                         </div>
                         <div class="card-body no-padding">
@@ -1978,17 +1980,6 @@
                         <div class="card-body">
                             <div id="weeklyBonusResult" style="display:none;margin-bottom:16px;"></div>
                             <h4 style="margin-bottom:12px;font-size:14px;color:var(--text-secondary);">积分流水</h4>
-                            
-                            <!-- 自定义积分修改 -->
-                            <div style="background:var(--bg);border-radius:12px;padding:16px;margin-bottom:20px;">
-                                <h4 style="margin-bottom:12px;font-size:14px;color:var(--text);">📝 自定义积分修改</h4>
-                                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                                    <input type="number" id="customPointsInput" placeholder="积分（正数加分，负数减分）" style="flex:1;min-width:150px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
-                                    <input type="text" id="customPointsReason" placeholder="原因说明" style="flex:2;min-width:200px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
-                                    <button class="btn-small" onclick="submitCustomPoints()" style="background:var(--accent);">提交</button>
-                                </div>
-                                <div id="customPointsResult" style="display:none;margin-top:10px;font-size:13px;"></div>
-                            </div>
                             <div id="pointsLedger">
                                 <div class="empty-state"><div class="empty-icon">📋</div><p>加载中...</p></div>
                             </div>
@@ -2017,6 +2008,22 @@
                 <div class="page" id="page-calendar"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">📅</div><p>学习日历 — 开发中</p></div></div></div></div>
                 <div class="page" id="page-messages"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-icon">💬</div><p>家长留言 — 开发中</p></div></div></div></div>
                 
+                <!-- 头像管理页面 -->
+                <div class="page" id="page-avatars">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>🎨 头像管理</h3>
+                            <button class="btn-small" onclick="openAvatarModal()">+ 添加头像</button>
+                        </div>
+                        <div class="card-body">
+                            <div id="avatarList">加载中...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
     <!-- 任务编辑模态框 -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal-box">
@@ -2118,22 +2125,32 @@
             </div>
         </div>
     </div>
-    <!-- 历史任务选择模态框（多选批量添加） -->
-    <div class="modal-overlay" id="historyTaskModal">
+
+    <!-- 头像编辑模态框 -->
+    <div class="modal-overlay" id="avatarModal">
         <div class="modal-box">
-            <h3>选择历史任务（可多选）</h3>
-            <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
-                <label style="cursor:pointer;font-size:14px;"><input type="checkbox" id="selectAllTasks" onchange="toggleSelectAll()"> 全选</label>
-                <span id="selectedCount" style="font-size:13px;color:var(--text-secondary);margin-left:auto;">已选 0 个</span>
+            <h3 id="avatarModalTitle">添加头像</h3>
+            <div class="modal-form">
+                <div class="form-group">
+                    <label>头像名称</label>
+                    <input type="text" id="avatarName" placeholder="例如：小猫咪">
+                </div>
+                <div class="form-group">
+                    <label>价格（积分）</label>
+                    <input type="number" id="avatarPrice" placeholder="100" min="0">
+                </div>
+                <div class="form-group">
+                    <label>头像图片</label>
+                    <input type="file" id="avatarImage" accept="image/*">
+                    <div id="avatarPreview" style="margin-top:10px;"></div>
+                </div>
             </div>
-            <div id="historyTaskList" style="max-height:400px;overflow-y:auto;margin:8px 0;"></div>
             <div class="modal-actions">
-                <button class="btn-small secondary" onclick="closeHistoryTaskModal()">取消</button>
-                <button class="btn-small primary" id="batchAddBtn" onclick="batchAddHistoryTasks()" disabled>确认添加（0）</button>
+                <button class="btn-small secondary" onclick="closeAvatarModal()">取消</button>
+                <button class="btn-small" id="avatarModalSave" onclick="saveAvatar()">保存</button>
             </div>
         </div>
     </div>
-
 
     <script>
         const API_BASE = '/xuexi/api';
@@ -3763,207 +3780,166 @@
             }
         }
 
-    </script>
+        // ============ 头像管理 ============
+        let editingAvatarId = null;
 
-<script>
-async function submitCustomPoints() {
-    const pointsInput = document.getElementById('customPointsInput');
-    const reasonInput = document.getElementById('customPointsReason');
-    const resultDiv = document.getElementById('customPointsResult');
-    
-    const points = parseInt(pointsInput.value);
-    const reason = reasonInput.value.trim();
-    
-    if (isNaN(points) || points === 0) {
-        resultDiv.style.display = 'block';
-        resultDiv.style.color = 'var(--danger)';
-        resultDiv.textContent = '请输入有效的积分数量（不能为0）';
-        return;
-    }
-    
-    if (!reason) {
-        resultDiv.style.display = 'block';
-        resultDiv.style.color = 'var(--danger)';
-        resultDiv.textContent = '请输入原因说明';
-        return;
-    }
-    
-    try {
-        const res = await fetch('/xuexi/api/points/custom', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('xuexi_token')
-            },
-            body: JSON.stringify({
-                student_id: 2, // 小石榴的ID
-                points: points,
-                reason: reason
-            })
-        });
-        
-        const data = await res.json();
-        
-        if (data.success) {
-            resultDiv.style.display = 'block';
-            resultDiv.style.color = 'var(--success)';
-            resultDiv.textContent = '✓ 积分修改成功！';
-            pointsInput.value = '';
-            reasonInput.value = '';
-            loadPointsPage(); // 刷新积分页面
-        } else {
-            resultDiv.style.display = 'block';
-            resultDiv.style.color = 'var(--danger)';
-            resultDiv.textContent = '✗ ' + (data.error || '修改失败');
-        }
-    } catch (e) {
-        resultDiv.style.display = 'block';
-        resultDiv.style.color = 'var(--danger)';
-        resultDiv.textContent = '✗ 提交失败：' + e.message;
-    }
-}
-</script>
-<script>
-
-// 显示历史任务选择弹窗（多选模式）
-async function showHistoryTaskModal() {
-    const date = document.getElementById('taskConfigDate').value;
-    if (!date) {
-        alert('请先选择日期');
-        return;
-    }
-    
-    try {
-        const res = await fetch('/xuexi/api/tasks/history', {
-            headers: { 'Authorization': 'Bearer ' + token }
-        });
-        const tasks = await res.json();
-        
-        // 获取当天已有的任务ID，用于标记已添加的
-        const dateRes = await fetch('/xuexi/api/checkins/' + date + '?student_id=' + studentId, {
-            headers: { 'Authorization': 'Bearer ' + token }
-        });
-        const dateTasks = await dateRes.json();
-        const existingTaskIds = new Set();
-        dateTasks.forEach(t => {
-            existingTaskIds.add(t.id);
-            if (t.sub_tasks) t.sub_tasks.forEach(st => existingTaskIds.add(st.id));
-        });
-        
-        let html = '';
-        tasks.forEach(task => {
-            const isExisting = existingTaskIds.has(task.id);
-            const subCount = (task.sub_tasks && task.sub_tasks.length > 0) ? '<div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">包含 ' + task.sub_tasks.length + ' 个子任务</div>' : '';
-            const disabledAttr = isExisting ? 'disabled' : '';
-            const opacityStyle = isExisting ? 'opacity:0.5;' : '';
-            const existingTag = isExisting ? '<span style="font-size:11px;color:var(--accent);margin-left:6px;">（已添加）</span>' : '';
-            
-            html += '<label style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;' + opacityStyle + '" class="task-checkbox-item">';
-            html += '<input type="checkbox" class="task-checkbox" value="' + task.id + '" data-name="' + task.name.replace(/"/g, '&quot;') + '" onchange="updateSelectedCount()" ' + disabledAttr + ' style="margin-right:10px;width:18px;height:18px;flex-shrink:0;">';
-            html += '<div><div style="font-weight:600;">' + task.icon + ' ' + task.name + existingTag + '</div>';
-            html += subCount;
-            html += '</div></label>';
-        });
-        
-        document.getElementById('historyTaskList').innerHTML = html;
-        document.getElementById('selectAllTasks').checked = false;
-        updateSelectedCount();
-        document.getElementById('historyTaskModal').classList.add('active');
-    } catch (e) {
-        console.error('加载历史任务失败:', e);
-        alert('加载历史任务失败');
-    }
-}
-
-function closeHistoryTaskModal() {
-    document.getElementById('historyTaskModal').classList.remove('active');
-}
-
-// 全选/取消全选
-function toggleSelectAll() {
-    const checked = document.getElementById('selectAllTasks').checked;
-    const checkboxes = document.querySelectorAll('.task-checkbox:not(:disabled)');
-    checkboxes.forEach(cb => { cb.checked = checked; });
-    updateSelectedCount();
-}
-
-// 更新已选数量和按钮状态
-function updateSelectedCount() {
-    const checkboxes = document.querySelectorAll('.task-checkbox:checked');
-    const count = checkboxes.length;
-    document.getElementById('selectedCount').textContent = '已选 ' + count + ' 个';
-    const btn = document.getElementById('batchAddBtn');
-    btn.textContent = '确认添加（' + count + '）';
-    btn.disabled = count === 0;
-    
-    // 同步全选checkbox状态
-    const allEnabled = document.querySelectorAll('.task-checkbox:not(:disabled)');
-    const allChecked = document.querySelectorAll('.task-checkbox:checked');
-    document.getElementById('selectAllTasks').checked = allEnabled.length > 0 && allEnabled.length === allChecked.length;
-}
-
-// 批量添加历史任务到当天打卡清单
-async function batchAddHistoryTasks() {
-    const date = document.getElementById('taskConfigDate').value;
-    if (!date) {
-        alert('请先选择日期');
-        return;
-    }
-    
-    const checkboxes = document.querySelectorAll('.task-checkbox:checked');
-    if (checkboxes.length === 0) return;
-    
-    const taskList = Array.from(checkboxes).map(cb => ({
-        id: parseInt(cb.value),
-        name: cb.dataset.name
-    }));
-    
-    const btn = document.getElementById('batchAddBtn');
-    btn.disabled = true;
-    btn.textContent = '添加中...';
-    
-    let successCount = 0;
-    let failCount = 0;
-    let failNames = [];
-    
-    for (const task of taskList) {
-        try {
-            const res = await fetch('/xuexi/api/checkins/add-task', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
-                body: JSON.stringify({
-                    student_id: studentId,
-                    task_id: task.id,
-                    date: date
-                })
-            });
-            const result = await res.json();
-            if (result.success) {
-                successCount++;
-            } else {
-                failCount++;
-                failNames.push(task.name);
+        async function loadAvatarsPage() {
+            try {
+                const res = await fetch(`${API_BASE}/avatars`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const avatars = await res.json();
+                renderAvatarList(avatars);
+            } catch (e) {
+                console.error('加载头像失败', e);
             }
-        } catch (e) {
-            failCount++;
-            failNames.push(task.name);
-            console.error('添加任务失败:', task.name, e);
         }
-    }
-    
-    // 显示结果
-    if (failCount === 0) {
-        alert('✓ 成功添加 ' + successCount + ' 个任务到 ' + date + ' 的打卡清单');
-    } else {
-        alert('添加完成：成功 ' + successCount + ' 个，失败 ' + failCount + ' 个\n失败任务：' + failNames.join('、'));
-    }
-    
-    closeHistoryTaskModal();
-    loadTaskConfig();
-}
-</script>
+
+        function renderAvatarList(avatars) {
+            const container = document.getElementById('avatarList');
+            if (!avatars || avatars.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">🎨</div><p>还没有头像，点击上方按钮添加第一个头像吧！</p></div>';
+                return;
+            }
+            let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px;">';
+            avatars.forEach(a => {
+                const imgUrl = a.image_url.startsWith('http') ? a.image_url : a.image_url;
+                html += `
+                    <div style="background:var(--card);border:2px solid var(--border);border-radius:16px;padding:12px;text-align:center;">
+                        <div style="width:80px;height:80px;border-radius:50%;overflow:hidden;margin:0 auto 8px;border:2px solid var(--border);">
+                            <img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;" alt="${a.name}">
+                        </div>
+                        <div style="font-size:13px;font-weight:600;margin-bottom:4px;">${a.name}</div>
+                        <div style="font-size:12px;color:var(--accent);font-weight:700;margin-bottom:8px;">⭐ ${a.price} 积分</div>
+                        <div style="display:flex;gap:6px;justify-content:center;">
+                            <button class="btn-small secondary" onclick="editAvatar(${a.id},'${a.name}',${a.price})" style="font-size:11px;padding:4px 10px;">编辑</button>
+                            <button class="btn-small danger" onclick="deleteAvatar(${a.id},'${a.name}')" style="font-size:11px;padding:4px 10px;">删除</button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function openAvatarModal(avatar = null) {
+            editingAvatarId = null;
+            document.getElementById('avatarModalTitle').textContent = '添加头像';
+            document.getElementById('avatarName').value = '';
+            document.getElementById('avatarPrice').value = '';
+            document.getElementById('avatarImage').value = '';
+            document.getElementById('avatarPreview').innerHTML = '';
+            document.getElementById('avatarModal').classList.add('active');
+        }
+
+        function closeAvatarModal() {
+            document.getElementById('avatarModal').classList.remove('active');
+            editingAvatarId = null;
+        }
+
+        function editAvatar(id, name, price) {
+            editingAvatarId = id;
+            document.getElementById('avatarModalTitle').textContent = '编辑头像';
+            document.getElementById('avatarName').value = name;
+            document.getElementById('avatarPrice').value = price;
+            document.getElementById('avatarImage').value = '';
+            document.getElementById('avatarPreview').innerHTML = '';
+            document.getElementById('avatarModal').classList.add('active');
+        }
+
+        async function saveAvatar() {
+            const name = document.getElementById('avatarName').value.trim();
+            const price = parseInt(document.getElementById('avatarPrice').value);
+            const fileInput = document.getElementById('avatarImage');
+
+            if (!name) { alert('请填写头像名称'); return; }
+            if (isNaN(price) || price < 0) { alert('请填写有效价格'); return; }
+
+            if (editingAvatarId) {
+                // 编辑模式
+                try {
+                    const res = await fetch(`${API_BASE}/avatars/${editingAvatarId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ name, price })
+                    });
+                    if (res.ok) {
+                        closeAvatarModal();
+                        await loadAvatarsPage();
+                        alert('修改成功！');
+                    } else {
+                        const err = await res.json();
+                        alert(`修改失败：${err.error || '未知错误'}`);
+                    }
+                } catch (e) {
+                    console.error('修改头像失败', e);
+                    alert('修改失败');
+                }
+            } else {
+                // 新增模式
+                if (!fileInput.files[0]) { alert('请选择头像图片'); return; }
+                const formData = new FormData();
+                formData.append('name', name);
+                formData.append('price', price);
+                formData.append('image', fileInput.files[0]);
+                try {
+                    const res = await fetch(`${API_BASE}/avatars`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                    });
+                    if (res.ok) {
+                        closeAvatarModal();
+                        await loadAvatarsPage();
+                        alert('添加成功！');
+                    } else {
+                        const err = await res.json();
+                        alert(`添加失败：${err.error || '未知错误'}`);
+                    }
+                } catch (e) {
+                    console.error('添加头像失败', e);
+                    alert('添加失败');
+                }
+            }
+        }
+
+        async function deleteAvatar(id, name) {
+            if (!confirm(`确定要删除头像「${name}」吗？已购买该头像的同学将无法使用。`)) return;
+            try {
+                const res = await fetch(`${API_BASE}/avatars/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    await loadAvatarsPage();
+                    alert('删除成功！');
+                } else {
+                    const err = await res.json();
+                    alert(`删除失败：${err.error || '未知错误'}`);
+                }
+            } catch (e) {
+                console.error('删除头像失败', e);
+                alert('删除失败');
+            }
+        }
+
+        // 图片预览
+        document.getElementById('avatarImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                document.getElementById('avatarPreview').innerHTML = `
+                    <div style="width:80px;height:80px;border-radius:50%;overflow:hidden;border:2px solid var(--border);">
+                        <img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;">
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
 </body>
 </html>
