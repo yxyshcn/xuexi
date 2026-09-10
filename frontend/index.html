@@ -3843,7 +3843,8 @@ async function showHistoryTaskModal() {
         const dateRes = await fetch('/xuexi/api/checkins/' + date + '?student_id=' + studentId, {
             headers: { 'Authorization': 'Bearer ' + token }
         });
-        const dateTasks = await dateRes.json();
+        const dateData = await dateRes.json();
+        const dateTasks = dateData.tasks || [];
         const existingTaskIds = new Set();
         dateTasks.forEach(t => {
             existingTaskIds.add(t.id);
